@@ -1,0 +1,20 @@
+AllCops:
+  TargetRubyVersion: 2.5
+
+Style/Documentation:
+  Enabled: false
+
+Metrics/LineLength:
+  Max: 200
+
+Metrics/AbcSize:
+  Max: 25
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Metrics/BlockLength:
+  ExcludedMethods: ['describe', 'context']

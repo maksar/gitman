@@ -17,6 +17,7 @@ RSpec.describe ModifyRules do
   let(:repository) { RepositoryInfo.new("TEST", slug: "TEST") }
   let(:active_directory) { DummyActiveDirectory.new("GROUP", ["regular"], ["with_access"], ["manager"]) }
   let(:jira_key) { "JIRA_KEY" }
+  let(:technical_coordinator) { "technical.coordinator" }
   let(:bitbucket) { DummyBitbucket.new(conversation, project, repository) }
 
   let(:continuation) { double(:continuation, method_missing: [:end, text: "END"]) }
@@ -24,16 +25,18 @@ RSpec.describe ModifyRules do
   before { Dialog.default = -> { described_class.new(DummyBitbucketFactory.new(bitbucket), active_directory).call(project.key, repository.slug) } }
 
   it "user does not want to modify anything" do
-    expect(runtime.chat(payload = [Dialog::NEGATIVE, Dialog::NEGATIVE, Dialog::NEGATIVE, Dialog::NEGATIVE, Dialog::NEGATIVE, Dialog::NEGATIVE])).to match(<<~TEXT.strip)
-      BOT: Do you want set up minimal approvals and builds? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
+    expect(runtime.chat(payload = [Dialog::NEGATIVE, Dialog::NEGATIVE, Dialog::NEGATIVE, Dialog::NEGATIVE, Dialog::NEGATIVE, Dialog::NEGATIVE, Dialog::NEGATIVE])).to match(<<~TEXT.strip)
+      BOT: Do you want to set up permissions for the project? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
+      USR: #{payload.shift}
+      BOT: Do you want to set up minimal approvals and builds? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
       BOT: Do you want to disable force push into repository? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
-      BOT: Do you want set up default branching model? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
+      BOT: Do you want to set up default branching model? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
-      BOT: Do you want set up branch permissions? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
+      BOT: Do you want to set up branch permissions? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
-      BOT: Do you want set up Large Files Support? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
+      BOT: Do you want to set up Large Files Support? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
       BOT: Do you want to set up commit hooks? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
@@ -42,32 +45,41 @@ RSpec.describe ModifyRules do
   end
 
   it "user wants to modify everything" do
-    expect(runtime.chat(payload = [Dialog::POSITIVE, active_directory.group, Dialog::POSITIVE, Dialog::POSITIVE, Dialog::POSITIVE, Dialog::POSITIVE, Dialog::POSITIVE, Dialog::POSITIVE, jira_key])).to match(<<~TEXT.strip)
-      BOT: Do you want set up minimal approvals and builds? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
+    expect(runtime.chat(payload = [Dialog::POSITIVE, active_directory.group, technical_coordinator, Dialog::POSITIVE, Dialog::POSITIVE, Dialog::POSITIVE, Dialog::POSITIVE, Dialog::POSITIVE, Dialog::POSITIVE, Dialog::POSITIVE, jira_key])).to match(<<~TEXT.strip)
+      BOT: Do you want to set up permissions for the project? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
       BOT: What is the name of the project development group:
       USR: #{payload.shift}
-      BOT: Group has following members: #{active_directory.regular.first}; #{active_directory.with_access.first}; #{active_directory.managers.first}
+      BOT: Granted write access for the group GROUP.
+      SRV: group_write_access(#{active_directory.group})
+      BOT: There is no technical coordinators in the #{active_directory.group} group.
+      BOT: Username of the technical coordinator:
+      USR: #{payload.shift}
+      BOT: Granted admin access for the people #{technical_coordinator}.
+      SRV: personal_admin_access([#{technical_coordinator}])
+      BOT: Do you want to set up minimal approvals and builds? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
+      USR: #{payload.shift}
+      BOT: Group #{active_directory.group} has following members: #{active_directory.regular.first}; #{active_directory.with_access.first}; #{active_directory.managers.first}
       BOT: Only following people have access to bitbucket: #{active_directory.with_access.first}; #{active_directory.managers.first}
       BOT: Only following people are not managers: #{active_directory.with_access.first}
       BOT: Setting up minimal approvals to half of the developer's teem (1) and minimal builds to 1?
       SRV: pull_requests(1, 1)
-      BOT: Do you want set up default reviewers? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
+      BOT: Do you want to set up default reviewers? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
       BOT: Adding default reviewers.
-      SRV: default_reviewers(["with_access"], 1)
+      SRV: default_reviewers([#{active_directory.with_access.first}], 1)
       BOT: Do you want to disable force push into repository? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
       SRV: enable_force_push()
-      BOT: Do you want set up default branching model? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
+      BOT: Do you want to set up default branching model? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
       BOT: Setting up default branching model.
       SRV: branch_model()
-      BOT: Do you want set up branch permissions? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
+      BOT: Do you want to set up branch permissions? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
       BOT: Setting branch permissions.
       SRV: branch_permissions()
-      BOT: Do you want set up Large Files Support? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
+      BOT: Do you want to set up Large Files Support? KBD: #{Dialog::POSITIVE}, #{Dialog::NEGATIVE}
       USR: #{payload.shift}
       BOT: Enabling Large Files Support.
       SRV: large_files_support()

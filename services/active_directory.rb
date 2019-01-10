@@ -6,7 +6,8 @@ require "active_support/core_ext/array/access"
 
 class ActiveDirectory
   BASE_DN = "OU=Itransition,DC=itransition,DC=corp"
-  GROUPS_DN = "OU=ProjectGroups,OU=Groups,#{BASE_DN}"
+  GROUPS_DN = "OU=Groups,#{BASE_DN}"
+  PROJECT_GROUPS_DN = "OU=ProjectGroups,#{GROUPS_DN}"
   USERS_DN = "OU=Active,OU=Users,#{BASE_DN}"
   PARTNERS_DN = "OU=Partners,OU=Users,#{BASE_DN}"
 
@@ -22,17 +23,15 @@ class ActiveDirectory
     ).tap(&:bind)
   end
 
-  def group_members(name, base = GROUPS_DN)
+  def group_members(name, base = PROJECT_GROUPS_DN)
     group = find(name, base, ["member"])
-    return unless attribute?(group, :member)
+    return [] unless attribute?(group, :member)
 
     group.member.map(&method(:dn)).flat_map do |member|
       if member.include?(", ")
-        # TODO: search only if needed.
-        # TODO do we need mail attribute
-        dn((find(member, USERS_DN, ["mail"]) || find(member, PARTNERS_DN, ["mail"])).dn)
+        member
       else
-        group_members(member)
+        group_members(member, base)
       end
     end.compact.uniq
   end

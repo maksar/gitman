@@ -15,6 +15,7 @@ class ModifyRules < Dialog
     @project = project
     @repository = repository
     Fiber.new do
+      permissions
       pull_requests
       force_push
       branch_model
@@ -27,10 +28,28 @@ class ModifyRules < Dialog
 
   private
 
+  def permissions
+    option("Do you want to set up permissions for the project?") do
+      @group = request("What is the name of the project development group:")
+      reply("Granted write access for the group #{@group}.")
+      bitbucket.group_write_access(@group)
+
+      administrators = @active_directory.group_members(@group) & @active_directory.group_members("Tech Coordinators", ActiveDirectory::GROUPS_DN)
+
+      if administrators.empty?
+        reply("There is no technical coordinators in the #{@group} group.")
+        administrators = [request("Username of the technical coordinator:")]
+      end
+
+      reply("Granted admin access for the people #{administrators.join(', ')}.")
+      bitbucket.personal_admin_access(administrators)
+    end
+  end
+
   def pull_requests
-    option("Do you want set up minimal approvals and builds?") do
-      group = request("What is the name of the project development group:")
-      reply("Group has following members: #{(members = @active_directory.group_members(group)).join('; ')}")
+    option("Do you want to set up minimal approvals and builds?") do
+      @group ||= request("What is the name of the project development group:")
+      reply("Group #{@group} has following members: #{(members = @active_directory.group_members(@group)).join('; ')}")
 
       members = members.select { |member| @active_directory.access?(member) }
       reply("Only following people have access to bitbucket: #{members.join('; ')}")
@@ -47,28 +66,28 @@ class ModifyRules < Dialog
   end
 
   def default_reviewers(members, count)
-    option("Do you want set up default reviewers?") do
+    option("Do you want to set up default reviewers?") do
       reply("Adding default reviewers.")
       bitbucket.default_reviewers(members, count)
     end
   end
 
   def branch_model
-    option("Do you want set up default branching model?") do
+    option("Do you want to set up default branching model?") do
       reply("Setting up default branching model.")
       bitbucket.branch_model
     end
   end
 
   def branch_permissions
-    option("Do you want set up branch permissions?") do
+    option("Do you want to set up branch permissions?") do
       reply("Setting branch permissions.")
       bitbucket.branch_permissions
     end
   end
 
   def large_files_support
-    option("Do you want set up Large Files Support?") do
+    option("Do you want to set up Large Files Support?") do
       reply("Enabling Large Files Support.")
       bitbucket.large_files_support
     end

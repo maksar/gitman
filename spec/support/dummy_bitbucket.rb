@@ -55,6 +55,14 @@ class DummyBitbucket < Bitbucket
   end
 
   def default_reviewers(members, count)
-    @conversation.service("default_reviewers(#{members}, #{count})")
+    @conversation.service("default_reviewers([#{members.join(', ')}], #{count})")
+  end
+
+  def group_write_access(group)
+    @conversation.service("group_write_access(#{group})")
+  end
+
+  def personal_admin_access(administrators)
+    @conversation.service("personal_admin_access([#{administrators.join(', ')}])")
   end
 end

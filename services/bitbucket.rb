@@ -32,7 +32,7 @@ class Bitbucket
   end
 
   def projects_link(prefix = API_PREFIX)
-    ENV.fetch('GITMAN_BITBUCKET_URL') + prefix
+    ENV.fetch("GITMAN_BITBUCKET_URL") + prefix
   end
 
   def project_link(prefix = API_PREFIX)
@@ -77,10 +77,10 @@ class Bitbucket
 
   def commit_hooks(jira_key)
     put("#{repository_link}/settings/hooks/com.isroot.stash.plugin.yacc:yaccHook/settings",
-        requireMatchingAuthorName: true, "errorMessage.COMMITTER_NAME": "author name is wrong",
-        requireMatchingAuthorEmail: true, committerEmailRegex: "", "errorMessage.COMMITTER_EMAIL": "email is wrong", "errorMessage.COMMITTER_EMAIL_REGEX": "",
-        commitMessageRegex: "", excludeMergeCommits: true, "errorMessage.COMMIT_REGEX": "",
-        requireJiraIssue: true, ignoreUnknownIssueProjectKeys: true, issueJqlMatcher: "project = #{jira_key}", "errorMessage.ISSUE_JQL": "",
+        requireMatchingAuthorName: true, "errorMessage.COMMITTER_NAME": "",
+        requireMatchingAuthorEmail: true, committerEmailRegex: "", "errorMessage.COMMITTER_EMAIL": "", "errorMessage.COMMITTER_EMAIL_REGEX": "",
+        commitMessageRegex: "#{jira_key}-\\d+.*", excludeMergeCommits: true, "errorMessage.COMMIT_REGEX": "",
+        requireJiraIssue: true, ignoreUnknownIssueProjectKeys: true, issueJqlMatcher: "", "errorMessage.ISSUE_JQL": "",
         branchNameRegex: "", "errorMessage.BRANCH_NAME": "", excludeBranchRegex: "",
         errorMessageHeader: "", errorMessageFooter: "",
         excludeByRegex: "", excludeUsers: "")
@@ -88,17 +88,19 @@ class Bitbucket
   end
 
   def branch_permissions
-    post(
-      "#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-permissions/2.0/projects/#{@project}/repos/#{@repository}/restrictions",
-      type: "pull-request-only",
-      matcher: {
-        id: "master, dev, develop, development, prod, production, stage, staging",
-        displayId: "master, dev, develop, development, prod, production, stage, staging",
-        type: { id: "PATTERN", name: "Pattern" },
-        active: true
-      },
-      users: [], groups: [], accessKeys: []
-    )
+    %w[master dev develop development prod production stage staging].each do |branch|
+      post(
+        "#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-permissions/2.0/projects/#{@project}/repos/#{@repository}/restrictions",
+        type: "pull-request-only",
+        matcher: {
+          id: branch,
+          displayId: branch,
+          type: { id: "PATTERN", name: "Pattern" },
+          active: true
+        },
+        users: [], groups: [], accessKeys: []
+      )
+    end
   end
 
   def default_reviewers(members, count)
@@ -116,14 +118,24 @@ class Bitbucket
         displayId: "ANY_REF_MATCHER_ID",
         type: { id: "ANY_REF", name: "Any branch" }
       },
-      reviewers: members.map(&method(:user)).compact, requiredApprovals: count
+      reviewers: members.map(&method(:user)).compact.map { |user| { id: user["id"] } }, requiredApprovals: count
     )
+  end
+
+  def group_write_access(group)
+    switch("#{repository_link}/permissions/groups?permission=REPO_WRITE&name=#{CGI.escape(group)}")
+  end
+
+  def personal_admin_access(administrators)
+    administrators.map do |administrator|
+      switch("#{repository_link}/permissions/users?permission=REPO_ADMIN&name=#{CGI.escape(user(administrator)['name'])}")
+    end
   end
 
   private
 
   def user(full_name)
-    (get("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/api/1.0/admin/users?filter=#{CGI.escape(full_name)}").try { |result| result["values"] } || []).first.try { |user_info| { id: user_info["id"] } }
+    get("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/api/1.0/admin/users?filter=#{CGI.escape(full_name)}").try { |result| result["values"] }.try(&:first)
   end
 
   def headers

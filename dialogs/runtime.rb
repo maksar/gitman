@@ -30,6 +30,9 @@ class Runtime
     when :statement then listen(chat, text, dialog)
     else raise
     end
+  rescue StandardError => error
+    print(chat, text: "Something bad happens: #{error}\n#{error.message}\n#{error.backtrace}")
+    Dialog.default.call
   end
 
   def print(chat, payload)

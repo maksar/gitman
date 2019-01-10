@@ -12,7 +12,9 @@ class DummyActiveDirectory < ActiveDirectory
 
   attr_reader :group, :regular, :with_access, :managers
 
-  def group_members(_name)
+  def group_members(name, _base = nil)
+    return [] unless name == @group
+
     @regular + @with_access + @managers
   end
 

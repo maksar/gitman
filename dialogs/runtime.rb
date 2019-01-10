@@ -21,18 +21,21 @@ class Runtime
     result = dialog.resume(text)
 
     return listen(chat, text, result) if result.is_a?(Fiber)
-    return if result.first == :end
 
     print(chat, result.last)
-
-    case result.first
-    when :question then dialog
-    when :statement then listen(chat, text, dialog)
-    else raise
-    end
+    decide(chat, dialog, result, text)
   rescue StandardError => error
     print(chat, text: "Something bad happens: #{error}\n#{error.message}\n#{error.backtrace}")
     Dialog.default.call
+  end
+
+  def decide(chat, dialog, result, text)
+    case result.first
+    when :question then dialog
+    when :statement then listen(chat, text, dialog)
+    when :end then nil
+    else print(chat, text: "Unknown internal command: #{result.first}.")
+    end
   end
 
   def print(chat, payload)

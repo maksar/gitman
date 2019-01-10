@@ -17,11 +17,9 @@ class ModifyRules < Dialog
     Fiber.new do
       permissions
       pull_requests
-      force_push
-      branch_model
-      branch_permissions
-      large_files_support
-      commit_hooks
+      branches
+      features
+      hooks
       answer("All done!")
     end
   end
@@ -30,39 +28,57 @@ class ModifyRules < Dialog
 
   def permissions
     option("Do you want to set up permissions for the project?") do
-      @group = request("What is the name of the project development group:")
-      reply("Granted write access for the group #{@group}.")
-      bitbucket.group_write_access(@group)
-
-      administrators = @active_directory.group_members(@group) & @active_directory.group_members("Tech Coordinators", ActiveDirectory::GROUPS_DN)
-
-      if administrators.empty?
-        reply("There is no technical coordinators in the #{@group} group.")
-        administrators = [request("Username of the technical coordinator:")]
-      end
-
-      reply("Granted admin access for the people #{administrators.join(', ')}.")
-      bitbucket.personal_admin_access(administrators)
+      group_access
+      admin_access
     end
+  end
+
+  def branches
+    branch_model
+    branch_permissions
+  end
+
+  def features
+    force_push
+    large_files_support
+  end
+
+  def admin_access
+    administrators = @active_directory.group_members(@group) & @active_directory.group_members("Tech Coordinators", ActiveDirectory::GROUPS_DN)
+
+    if administrators.empty?
+      reply("There is no technical coordinators in the #{@group} group.")
+      administrators = [request("Username of the technical coordinator:")]
+    end
+
+    reply("Granted admin access for the people #{administrators.join(', ')}.")
+    bitbucket.personal_admin_access(administrators)
+  end
+
+  def group_access
+    @group = request("What is the name of the project development group:")
+    reply("Granted write access for the group #{@group}.")
+    bitbucket.group_write_access(@group)
   end
 
   def pull_requests
     option("Do you want to set up minimal approvals and builds?") do
       @group ||= request("What is the name of the project development group:")
-      reply("Group #{@group} has following members: #{(members = @active_directory.group_members(@group)).join('; ')}")
 
-      members = members.select { |member| @active_directory.access?(member) }
-      reply("Only following people have access to bitbucket: #{members.join('; ')}")
-
-      members = members.reject { |member| @active_directory.manager?(member) }
-      reply("Only following people are not managers: #{members.join('; ')}")
+      reply("Group #{@group} has following members: #{join(members = @active_directory.group_members(@group))}")
+      reply("Only following people have access to bitbucket: #{join(members = members.select { |member| @active_directory.access?(member) })}")
+      reply("Only following people are not managers: #{join(members = members.reject { |member| @active_directory.manager?(member) })}")
 
       count = (members.size / 2.0).ceil
-      reply("Setting up minimal approvals to half of the developer's teem (#{count}) and minimal builds to 1?")
+      reply("Setting up minimal approvals to half of the developer's team (#{count}) and minimal builds to 1?")
       bitbucket.pull_requests(count, 1)
 
       default_reviewers(members, count)
     end
+  end
+
+  def join(members)
+    members.join("; ")
   end
 
   def default_reviewers(members, count)
@@ -93,7 +109,7 @@ class ModifyRules < Dialog
     end
   end
 
-  def commit_hooks
+  def hooks
     option("Do you want to set up commit hooks?") do
       jira_key = request("What is JIRA project key?")
       reply("Enabling commit hooks - jira task prefix, proper author name and email.")

@@ -30,6 +30,6 @@ class DummyRuntime < Runtime
   private
 
   def print(_chat, message)
-    @conversation.bot(message)
+    @conversation.bot(message) if message.fetch(:text)
   end
 end

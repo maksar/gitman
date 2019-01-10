@@ -47,10 +47,7 @@ class Bitbucket
     post(
       "#{repository_link}/settings/pull-requests",
       mergeConfig: { defaultStrategy: { id: "no-ff" }, strategies: [{ id: "no-ff" }] },
-      requiredAllApprovers: false,
-      requiredApprovers: approvals_count,
-      requiredAllTasksComplete: true,
-      requiredSuccessfulBuilds: builds_count
+      requiredAllApprovers: false, requiredApprovers: approvals_count, requiredAllTasksComplete: true, requiredSuccessfulBuilds: builds_count
     )
   end
 
@@ -59,16 +56,12 @@ class Bitbucket
   end
 
   def branch_model
-    put(
-      "#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-utils/1.0/projects/#{@project}/repos/#{@repository}/branchmodel/configuration",
-      development: { useDefault: true },
-      types: [
-        { id: "BUGFIX", displayName: "Bugfix", enabled: true, prefix: "bugfix/" },
-        { id: "FEATURE", displayName: "Feature", enabled: true, prefix: "feature/" },
-        { id: "HOTFIX", displayName: "Hotfix", enabled: true, prefix: "hotfixme/" },
-        { id: "RELEASE", displayName: "Release", enabled: true, prefix: "release/" }
-      ]
-    )
+    put("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-utils/1.0/projects/#{@project}/repos/#{@repository}/branchmodel/configuration",
+        development: { useDefault: true },
+        types: [{ id: "BUGFIX", displayName: "Bugfix", enabled: true, prefix: "bugfix/" },
+                { id: "FEATURE", displayName: "Feature", enabled: true, prefix: "feature/" },
+                { id: "HOTFIX", displayName: "Hotfix", enabled: true, prefix: "hotfixme/" },
+                { id: "RELEASE", displayName: "Release", enabled: true, prefix: "release/" }])
   end
 
   def large_files_support
@@ -77,49 +70,24 @@ class Bitbucket
 
   def commit_hooks(jira_key)
     put("#{repository_link}/settings/hooks/com.isroot.stash.plugin.yacc:yaccHook/settings",
-        requireMatchingAuthorName: true, "errorMessage.COMMITTER_NAME": "",
-        requireMatchingAuthorEmail: true, committerEmailRegex: "", "errorMessage.COMMITTER_EMAIL": "", "errorMessage.COMMITTER_EMAIL_REGEX": "",
-        commitMessageRegex: "#{jira_key}-\\d+.*", excludeMergeCommits: true, "errorMessage.COMMIT_REGEX": "",
-        requireJiraIssue: true, ignoreUnknownIssueProjectKeys: true, issueJqlMatcher: "", "errorMessage.ISSUE_JQL": "",
-        branchNameRegex: "", "errorMessage.BRANCH_NAME": "", excludeBranchRegex: "",
-        errorMessageHeader: "", errorMessageFooter: "",
-        excludeByRegex: "", excludeUsers: "")
+        commitMessageRegex: "#{jira_key}-\\d+.*", requireJiraIssue: true, ignoreUnknownIssueProjectKeys: true,
+        requireMatchingAuthorName: true, requireMatchingAuthorEmail: true, excludeMergeCommits: true)
     switch("#{repository_link}/settings/hooks/com.isroot.stash.plugin.yacc:yaccHook/enabled")
   end
 
   def branch_permissions
     %w[master dev develop development prod production stage staging].each do |branch|
-      post(
-        "#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-permissions/2.0/projects/#{@project}/repos/#{@repository}/restrictions",
-        type: "pull-request-only",
-        matcher: {
-          id: branch,
-          displayId: branch,
-          type: { id: "PATTERN", name: "Pattern" },
-          active: true
-        },
-        users: [], groups: [], accessKeys: []
-      )
+      post("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-permissions/2.0/projects/#{@project}/repos/#{@repository}/restrictions",
+           type: "pull-request-only", users: [], groups: [], accessKeys: [],
+           matcher: { id: branch, displayId: branch, type: { id: "PATTERN", name: "Pattern" }, active: true })
     end
   end
 
   def default_reviewers(members, count)
-    post(
-      "#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/default-reviewers/1.0/projects/#{@project}/repos/#{@repository}/condition",
-      sourceMatcher: {
-        active: true,
-        id: "ANY_REF_MATCHER_ID",
-        displayId: "ANY_REF_MATCHER_ID",
-        type: { id: "ANY_REF", name: "Any branch" }
-      },
-      targetMatcher: {
-        active: true,
-        id: "ANY_REF_MATCHER_ID",
-        displayId: "ANY_REF_MATCHER_ID",
-        type: { id: "ANY_REF", name: "Any branch" }
-      },
-      reviewers: members.map(&method(:user)).compact.map { |user| { id: user["id"] } }, requiredApprovals: count
-    )
+    post("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/default-reviewers/1.0/projects/#{@project}/repos/#{@repository}/condition",
+         sourceMatcher: { active: true, id: "ANY_REF_MATCHER_ID", displayId: "ANY_REF_MATCHER_ID", type: { id: "ANY_REF", name: "Any branch" } },
+         targetMatcher: { active: true, id: "ANY_REF_MATCHER_ID", displayId: "ANY_REF_MATCHER_ID", type: { id: "ANY_REF", name: "Any branch" } },
+         reviewers: members.map(&method(:user)).compact.map { |user| { id: user["id"] } }, requiredApprovals: count)
   end
 
   def group_write_access(group)
@@ -139,11 +107,8 @@ class Bitbucket
   end
 
   def headers
+    auth = Base64.encode64([ENV.fetch("GITMAN_BITBUCKET_USERNAME"), ENV.fetch("GITMAN_BITBUCKET_PASSWORD")].join(":")).strip
     { Authorization: "Basic #{auth}", content_type: :json }
-  end
-
-  def auth
-    Base64.encode64([ENV.fetch("GITMAN_BITBUCKET_USERNAME"), ENV.fetch("GITMAN_BITBUCKET_PASSWORD")].join(":")).strip
   end
 
   def post(url, data)

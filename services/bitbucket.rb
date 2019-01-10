@@ -7,6 +7,9 @@ require "cgi"
 require "active_support/core_ext/object/try"
 
 class Bitbucket
+  API_PREFIX = "/rest/api/1.0/projects"
+  BROWSER_PREFIX = "/projects"
+
   def initialize(project, repository)
     @project = project
     @repository = repository
@@ -28,16 +31,16 @@ class Bitbucket
     post("#{project_link}/repos", slug: @repository, name: name, public: false, forkable: false)
   end
 
-  def projects_link
-    "#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/api/1.0/projects"
+  def projects_link(prefix = API_PREFIX)
+    ENV.fetch('GITMAN_BITBUCKET_URL') + prefix
   end
 
-  def project_link
-    projects_link + "/#{@project}"
+  def project_link(prefix = API_PREFIX)
+    projects_link(prefix) + "/#{@project}"
   end
 
-  def repository_link
-    project_link + "/repos/#{@repository}"
+  def repository_link(prefix = API_PREFIX)
+    project_link(prefix) + "/repos/#{@repository}"
   end
 
   def pull_requests(approvals_count, builds_count)

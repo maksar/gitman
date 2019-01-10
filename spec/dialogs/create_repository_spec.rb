@@ -46,7 +46,7 @@ RSpec.describe CreateRepository do
         USR: #{payload.shift}
         SRV: create_repository(#{repository.name})
         BOT: Name: #{repository.name}
-        BOT: Repository created! LNK: #{bitbucket.projects_link}/#{project.key}/repos/#{repository.slug}
+        BOT: Repository created! LNK: #{bitbucket.projects_link(Bitbucket::BROWSER_PREFIX)}/#{project.key}/repos/#{repository.slug}
       TEXT
     end
   end

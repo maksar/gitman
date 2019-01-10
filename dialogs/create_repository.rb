@@ -36,7 +36,7 @@ class CreateRepository < Dialog
     name = request("Specify repository name (human readable):")
     ask("We are about to create repository with name '#{name}', slug '#{@repository}'") do
       print_info(bitbucket.create_repository(name))
-      reply("Repository created!", link: bitbucket.repository_link)
+      reply("Repository created!", link: bitbucket.repository_link(Bitbucket::BROWSER_PREFIX))
       @modify_rules.call(@project, @repository)
     end
   end

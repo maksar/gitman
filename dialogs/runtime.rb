@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require "facets/kernel/ergo"
+require_relative "dialog"
+require "active_support/core_ext/object/try"
+require "telegram/bot"
 
 class Runtime
   def initialize(bot)
@@ -19,6 +21,7 @@ class Runtime
     result = dialog.resume(text)
 
     return listen(chat, text, result) if result.is_a?(Fiber)
+    return if result.first == :end
 
     print(chat, result.last)
 
@@ -34,10 +37,10 @@ class Runtime
   end
 
   def reply_markup(payload)
-    payload[:link].ergo do |link|
+    payload[:link].try do |link|
       Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: [Telegram::Bot::Types::InlineKeyboardButton.new(text: payload.fetch(:text), url: link)])
     end ||
-      payload[:answers].ergo do |answers|
+      payload[:answers].try do |answers|
         Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: answers, one_time_keyboard: true)
       end ||
       Telegram::Bot::Types::ReplyKeyboardMarkup.new(remove_keyboard: true)

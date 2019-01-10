@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require "facets/class/cattr"
+require "fiber"
+require "active_support/core_ext/class/attribute_accessors"
 
 class Dialog
   POSITIVE = "Yes"
@@ -10,20 +11,24 @@ class Dialog
 
   private
 
-  def ask(question)
+  def ask(question, negative = -> { answer("Ok then.") })
     if request(question, answers: [[POSITIVE, NEGATIVE]]) == POSITIVE
       yield
     else
-      answer("Ok then.")
+      negative.call
     end
+  end
+
+  def option(question, &block)
+    ask(question, -> {}, &block)
   end
 
   def request(question, answers: nil, link: nil)
     Fiber.yield(:question, text: question, answers: answers, link: link)
   end
 
-  def reply(statement)
-    Fiber.yield(:statement, text: statement)
+  def reply(statement, link: nil)
+    Fiber.yield(:statement, text: statement, link: link)
   end
 
   def answer(answer, link: nil)

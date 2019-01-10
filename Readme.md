@@ -1,5 +1,7 @@
 
-export `cat .env` && ruby server.rb
+source <(sed -E "s/[^#]+/export &/g" .env) && ruby server.rb
 
-rubocop
-deep-cover exec rspec
+rubocop -a && deep-cover clone rspec && open coverage/index.html
+
+add access to repo
+change url

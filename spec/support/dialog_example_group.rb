@@ -14,7 +14,7 @@ module DialogExampleGroup
     let(:yes) { Dialog::POSITIVE }
     let(:no) { Dialog::NEGATIVE }
     let(:conversation) { Conversation.new }
-    let(:runtime) { DummyRuntime.new(conversation) }
+    let(:runtime) { DummyRuntime.new(conversation, dialog) }
     let(:continuation) { double(:continuation, method_missing: [:end, text: nil]) }
   end
 

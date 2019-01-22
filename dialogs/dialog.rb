@@ -7,8 +7,6 @@ class Dialog
   POSITIVE = "Yes"
   NEGATIVE = "No"
 
-  cattr_accessor :default
-
   private
 
   def ask(question, negative = -> { answer("Ok then.") })
@@ -33,6 +31,6 @@ class Dialog
 
   def answer(answer, link: nil)
     request(answer, link: link)
-    self.class.default.call
+    Fiber.yield(:end, text: nil)
   end
 end

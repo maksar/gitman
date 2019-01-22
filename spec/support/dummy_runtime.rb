@@ -1,19 +1,20 @@
 # frozen_string_literal: true
 
 require_relative "../../dialogs/runtime"
+require_relative "dummy_auth"
 require "telegram/bot"
 
 class DummyRuntime < Runtime
   START = "/start"
 
-  def initialize(conversation)
+  def initialize(conversation, dialog)
     @conversation = conversation
-    super(nil)
+    super(nil, dialog, DummyAuth.new)
   end
 
   def chat(answers)
     ([START] + answers).each do |text|
-      main_loop(Telegram::Bot::Types::Message.new(chat: Telegram::Bot::Types::Chat.new(id: 0), text: text))
+      main_loop(Telegram::Bot::Types::Message.new(from: Telegram::Bot::Types::User.new(id: 0), chat: Telegram::Bot::Types::Chat.new(id: 0), text: text))
     end
     @conversation.text.join("\n")
   end
@@ -28,6 +29,12 @@ class DummyRuntime < Runtime
   end
 
   private
+
+  def decide(chat, dialog, result, text)
+    return if result.first == :end
+
+    super
+  end
 
   def print(_chat, message)
     @conversation.bot(message) if message.fetch(:text)

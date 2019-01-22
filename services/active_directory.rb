@@ -3,6 +3,7 @@
 require "net-ldap"
 require "net/ldap/dn"
 require "active_support/core_ext/array/access"
+require "active_support/core_ext/object/try"
 
 class ActiveDirectory
   BASE_DN = "OU=Itransition,DC=itransition,DC=corp"
@@ -25,7 +26,7 @@ class ActiveDirectory
 
   def group_members(name, base = PROJECT_GROUPS_DN)
     group = find(name, base, ["member"])
-    return [] unless attribute?(group, :member)
+    return [] unless attribute(group, :member)
 
     group.member.map(&method(:dn)).flat_map do |member|
       if member.include?(", ")
@@ -37,23 +38,31 @@ class ActiveDirectory
   end
 
   def access?(name)
-    user = find(name, USERS_DN, ["memberof"]) || find(name, PARTNERS_DN, ["memberof"])
-    return unless attribute?(user, :memberof)
-
-    user.memberof.include?("CN=Git.Users.Licensed,OU=ServiceGroups,OU=Groups,#{BASE_DN}")
+    user_groups(name).include?("CN=Git.Users.Licensed,OU=ServiceGroups,OU=Groups,#{BASE_DN}")
   end
 
   def manager?(name)
-    user = find(name, USERS_DN, ["memberof"]) || find(name, PARTNERS_DN, ["memberof"])
-    return unless attribute?(user, :memberof)
+    user_groups(name).any? { |group| group.include?("Managers") }
+  end
 
-    user.memberof.any? { |group| group.include?("Managers") }
+  def user_info(name)
+    user = user(name, %w[extensionAttribute10 mobile])
+
+    { phone: attribute(user, :mobile).try(&:first), uid: attribute(user, :extensionAttribute10).try(&:first) }
+  end
+
+  def user_groups(name)
+    attribute(user(name, ["memberof"]), :memberof)
   end
 
   private
 
-  def attribute?(entry, attribute)
-    entry&.attribute_names&.include?(attribute)
+  def user(name, attributes)
+    find(name, USERS_DN, attributes) || find(name, PARTNERS_DN, attributes)
+  end
+
+  def attribute(entry, attribute)
+    (entry || {})[attribute]
   end
 
   def dn(full)

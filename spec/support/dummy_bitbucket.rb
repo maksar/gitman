@@ -4,7 +4,7 @@ require_relative "../../services/bitbucket"
 require_relative "project_info"
 require_relative "repository_info"
 
-class DummyBitbucket < Bitbucket
+class DummyBitbucket < Services::Bitbucket
   def initialize(conversation, project_info, repository_info)
     super(project_info&.key, repository_info&.slug)
     @conversation = conversation

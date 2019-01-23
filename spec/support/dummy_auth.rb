@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "../../auth"
+require_relative "../../services/auth"
 
-class DummyAuth < Auth
+class DummyAuth < Services::Auth
   def allowed?(_uid)
     true
   end

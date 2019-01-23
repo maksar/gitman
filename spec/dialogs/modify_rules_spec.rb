@@ -9,7 +9,7 @@ require_relative "../support/dummy_bitbucket_factory"
 require_relative "../support/dummy_bitbucket"
 require_relative "../support/dummy_active_directory"
 
-RSpec.describe ModifyRules do
+RSpec.describe Dialogs::ModifyRules do
   let(:dialog) { proc { described_class.new(DummyBitbucketFactory.new(bitbucket), active_directory).call(project.key, repository.slug) } }
   let(:project) { ProjectInfo.new("TEST", key: "TEST") }
   let(:repository) { RepositoryInfo.new("TEST", slug: "TEST") }

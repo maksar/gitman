@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require_relative "../auth"
-require_relative "dialog"
-require "active_support/core_ext/object/try"
 require "telegram/bot"
+require "active_support/core_ext/object/try"
+
+require_relative "services/auth"
 
 class Runtime
-  def initialize(bot, default_dialog, auth = Auth.new)
+  def initialize(bot, default_dialog, auth = Services::Auth.new)
     @bot = bot
     @dialogs = Hash.new { default_dialog.call }
     @auth = auth

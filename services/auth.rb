@@ -8,7 +8,7 @@ module Services
   class Auth
     def initialize(active_directory = ActiveDirectory.new)
       @active_directory = active_directory
-      @store = YAML::Store.new("users.yml")
+      @store = YAML::Store.new("config/users.yml")
     end
 
     def authorize(contact)

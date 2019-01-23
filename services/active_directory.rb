@@ -15,13 +15,9 @@ module Services
 
     def initialize
       @ldap = Net::LDAP.new(
-        host: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_ADDRESS"),
-        port: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_PORT").to_i,
-        auth: {
-          method: :simple,
-          username: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_USERNAME"),
-          password: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_PASSWORD")
-        }
+        host: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_ADDRESS"), port: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_PORT").to_i,
+        auth: { method: :simple, username: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_USERNAME"), password: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_PASSWORD") },
+        encryption: { method: :simple_tls, tls_options: { ca_file: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_CERTIFICATE"), verify_mode: OpenSSL::SSL::VERIFY_PEER } }
       ).tap(&:bind)
     end
 

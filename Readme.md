@@ -27,7 +27,7 @@ What Gitman can do:
 * Telegram account
 * ruby 2.6
 * `.env` with correct values for keys from `.env.sample`
-* `users.yml` with correct values for allowed users from `users.yml.sample`
+* `config/users.yml` with correct values for allowed users from `config/users.yml.sample`
 
 ## Install
 
@@ -79,15 +79,15 @@ Telegram uses `@BotFather` bot to create and manage bots. `@itransition_gitman_b
 
 ## Authentication
 
-`users.yml` file contains list of allowed users in a format `Lastname, Firstname`. 
+`config/users.yml` file contains list of allowed users in a format `Lastname, Firstname`. 
 Bot will ask to send user's contact. Then it will check ActiveDirectory for user's fist and last name, phone number and uid (in `extensionAttribute10` field).
-If everything matches, bot will store user in `users.yml` file and start talking to him. 
+If everything matches, bot will store user in `config/users.yml` file and start talking to him. 
 
 ## Running
 
 ### Docker
     docker build -t gitman .
-    docker run --rm --env-file .env -v $PWD/users.yml:/app/users.yml -it gitman ./server.rb
+    docker run --rm --env-file .env -v $PWD/config/:/app/config/ -it gitman
 
 ### Local
     source <(sed -r 's/([A-Z_]+)=(.*)/export \1="\2"/g' .env)

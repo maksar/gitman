@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "../../dialogs/runtime"
+require_relative "../../runtime"
 require_relative "dummy_auth"
 require "telegram/bot"
 

@@ -2,7 +2,7 @@
 
 require_relative "../../services/bitbucket_factory"
 
-class DummyBitbucketFactory < BitbucketFactory
+class DummyBitbucketFactory < Services::BitbucketFactory
   def initialize(bitbucket)
     @bitbucket = bitbucket
   end

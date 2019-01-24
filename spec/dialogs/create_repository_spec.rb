@@ -8,7 +8,7 @@ require_relative "../support/repository_info"
 require_relative "../support/dummy_bitbucket_factory"
 require_relative "../support/dummy_bitbucket"
 
-RSpec.describe CreateRepository do
+RSpec.describe Dialogs::CreateRepository do
   let(:dialog) { proc { described_class.new(DummyBitbucketFactory.new(bitbucket), continuation).call(project.key) } }
   let(:project) { ProjectInfo.new("TEST", key: "TEST") }
   let(:repository) { RepositoryInfo.new("TEST", key: "TEST", name: "Test Repository", description: "Test Repository description", type: "normal") }
@@ -40,7 +40,7 @@ RSpec.describe CreateRepository do
         USR: #{payload.shift}
         SRV: create_repository(#{repository.name})
         BOT: Name: #{repository.name}
-        BOT: Repository created! LNK: #{bitbucket.projects_link(Bitbucket::BROWSER_PREFIX)}/#{project.key}/repos/#{repository.slug}
+        BOT: Repository created! LNK: #{bitbucket.projects_link(Services::Bitbucket::BROWSER_PREFIX)}/#{project.key}/repos/#{repository.slug}
       TEXT
     end
   end

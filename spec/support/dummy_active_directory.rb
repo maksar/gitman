@@ -2,7 +2,7 @@
 
 require_relative "../../services/active_directory"
 
-class DummyActiveDirectory < ActiveDirectory
+class DummyActiveDirectory < Services::ActiveDirectory
   def initialize(group, regular, with_access, managers)
     @group = group
     @regular = regular

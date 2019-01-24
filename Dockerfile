@@ -9,4 +9,4 @@ RUN cd /app && bundle install -j6 --without=development --frozen
 ADD . /app/
 WORKDIR /app
 
-ENTRYPOINT ["sh", "-c"]
+ENTRYPOINT ["ruby", "server.rb"]

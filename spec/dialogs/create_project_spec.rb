@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 require_relative "../support/dialog_example_group"
+
 require_relative "../../dialogs/create_project"
 require_relative "../support/project_info"
 require_relative "../support/dummy_bitbucket_factory"
 require_relative "../support/dummy_bitbucket"
 
-RSpec.describe CreateProject do
+RSpec.describe Dialogs::CreateProject do
+  let(:dialog) { proc { described_class.new(DummyBitbucketFactory.new(bitbucket), continuation).call } }
   let(:project) { ProjectInfo.new("TEST", key: "TEST", name: "Test Project", description: "Test Project description", type: "normal") }
-
-  before { Dialog.default = -> { described_class.new(DummyBitbucketFactory.new(bitbucket), continuation).call } }
 
   context "when project does not exist" do
     let(:bitbucket) { DummyBitbucket.new(conversation, nil, nil) }

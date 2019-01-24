@@ -1,21 +1,22 @@
 # frozen_string_literal: true
 
 require_relative "../support/dialog_example_group"
+
+require_relative "../../dialogs/modify_rules"
 require_relative "../support/project_info"
 require_relative "../support/repository_info"
 require_relative "../support/dummy_bitbucket_factory"
 require_relative "../support/dummy_bitbucket"
 require_relative "../support/dummy_active_directory"
 
-RSpec.describe ModifyRules do
+RSpec.describe Dialogs::ModifyRules do
+  let(:dialog) { proc { described_class.new(DummyBitbucketFactory.new(bitbucket), active_directory).call(project.key, repository.slug) } }
   let(:project) { ProjectInfo.new("TEST", key: "TEST") }
   let(:repository) { RepositoryInfo.new("TEST", slug: "TEST") }
   let(:active_directory) { DummyActiveDirectory.new("GROUP", ["regular"], ["with_access"], ["manager"]) }
   let(:jira_key) { "JIRA_KEY" }
   let(:technical_coordinator) { "technical.coordinator" }
   let(:bitbucket) { DummyBitbucket.new(conversation, project, repository) }
-
-  before { Dialog.default = -> { described_class.new(DummyBitbucketFactory.new(bitbucket), active_directory).call(project.key, repository.slug) } }
 
   it "user does not want to modify anything" do
     expect(runtime.chat(payload = [no, no, no, no, no, no, no])).to match(<<~TEXT.strip)

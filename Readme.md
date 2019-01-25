@@ -99,4 +99,4 @@ If everything matches, bot will store user in `config/users.yml` file and start 
 
 ## TODO
 * disable branch deletion
-* introduce namespaces
+* bitbucket doesn't allow to specify slug, deal with it

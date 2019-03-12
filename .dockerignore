@@ -5,3 +5,4 @@ config/
 spec/
 .*
 Dockerfile
+Makefile

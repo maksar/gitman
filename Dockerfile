@@ -1,4 +1,4 @@
-FROM ruby:2.6.0 as ruby
+FROM ruby:2.6.2 as ruby
 
 WORKDIR /app
 COPY Gemfile* /app/
@@ -13,6 +13,7 @@ COPY --from=ruby /app /app
 
 COPY --from=ruby /lib/x86_64-linux-gnu/libz.so.* /lib/x86_64-linux-gnu/
 COPY --from=ruby /usr/lib/x86_64-linux-gnu/libyaml* /usr/lib/x86_64-linux-gnu/
+COPY --from=ruby /usr/lib/x86_64-linux-gnu/libgmp* /usr/lib/x86_64-linux-gnu/
 COPY --from=ruby /usr/local/lib /usr/local/lib
 COPY --from=ruby /usr/local/bin/ruby /usr/local/bin/ruby
 COPY --from=ruby /usr/local/bin/bundle /usr/local/bin/bundle

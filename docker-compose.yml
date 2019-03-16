@@ -1,0 +1,8 @@
+version: '2.1'
+services:
+  gitman:
+    restart: always
+    image: docker-registry.itransition.corp/gitman
+    env_file: .env
+    volumes:
+      - $PWD/config/:/app/config/

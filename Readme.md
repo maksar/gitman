@@ -86,8 +86,9 @@ If everything matches, bot will store user in `config/users.yml` file and start 
 ## Running
 
 ### Docker
-    docker build -t gitman .
-    docker run --rm --env-file .env -v $PWD/config/:/app/config/ -it gitman
+    docker login docker-registry.itransition.corp
+    docker-compose pull
+    docker-compose up -d
 
 ### Local
     source <(sed -r 's/([A-Z_]+)=(.*)/export \1="\2"/g' .env)

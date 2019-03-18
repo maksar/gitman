@@ -43,9 +43,9 @@ module Services
     end
 
     def user_info(name)
-      user = user(name, %w[extensionAttribute10 mobile])
+      user = user(name, %w[extensionAttribute9 mobile])
 
-      { phone: attribute(user, :mobile).try(&:first), uid: attribute(user, :extensionAttribute10).try(&:first) }
+      { phone: attribute(user, :mobile).try(&:first), uid: attribute(user, :extensionAttribute9).try(&:first) }
     end
 
     def user_groups(name)

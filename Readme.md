@@ -80,7 +80,7 @@ Telegram uses `@BotFather` bot to create and manage bots. `@itransition_gitman_b
 ## Authentication
 
 `config/users.yml` file contains list of allowed users in a format `Lastname, Firstname`. 
-Bot will ask to send user's contact. Then it will check ActiveDirectory for user's fist and last name, phone number and uid (in `extensionAttribute10` field).
+Bot will ask to send user's contact. Then it will check ActiveDirectory for user's fist and last name, phone number and uid (in `extensionAttribute9` field).
 If everything matches, bot will store user in `config/users.yml` file and start talking to him. 
 
 ## Running

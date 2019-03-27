@@ -52,14 +52,17 @@ module Dialogs
         administrators = [request("Username of the technical coordinator:")]
       end
 
-      reply("Granted admin access for the people #{administrators.join(', ')}.")
       bitbucket.personal_admin_access(administrators)
+      reply("Granted admin access for the people #{administrators.join(', ')}.")
     end
 
     def group_access
-      @group = request("What is the name of the project development group:")
-      reply("Granted write access for the group #{@group}.")
+      while @active_directory.group_members(@group = request("What is the name of the project development group:")).empty?
+        reply("Cannot find any members in group #{@group}.")
+      end
+
       bitbucket.group_write_access(@group)
+      reply("Granted write access for the group #{@group}.")
     end
 
     def pull_requests

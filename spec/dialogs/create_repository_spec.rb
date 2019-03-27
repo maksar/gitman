@@ -18,7 +18,7 @@ RSpec.describe Dialogs::CreateRepository do
 
     it "user does not want to create repository" do
       expect(runtime.chat(payload = [repository.slug, no])).to match(<<~TEXT.strip)
-        BOT: What is Bitbucket repository name?
+        BOT: What is Bitbucket repository key?
         USR: #{payload.shift}
         BOT: There is no such repository in #{project.key} project.
         BOT: Do you want to create it? KBD: #{yes}, #{no}
@@ -29,18 +29,18 @@ RSpec.describe Dialogs::CreateRepository do
 
     it "user wants to create a repository" do
       expect(runtime.chat(payload = [repository.slug, yes, repository.name, yes])).to match(<<~TEXT.strip)
-        BOT: What is Bitbucket repository name?
+        BOT: What is Bitbucket repository key?
         USR: #{payload.shift}
         BOT: There is no such repository in #{project.key} project.
         BOT: Do you want to create it? KBD: #{yes}, #{no}
         USR: #{payload.shift}
-        BOT: Specify repository name (human readable):
+        BOT: Specify human readable repository name:
         USR: #{payload.shift}
-        BOT: We are about to create repository with name '#{repository.name}', slug '#{repository.slug}' KBD: #{yes}, #{no}
+        BOT: We are about to create repository with name '#{repository.name}' KBD: #{yes}, #{no}
         USR: #{payload.shift}
         SRV: create_repository(#{repository.name})
         BOT: Name: #{repository.name}
-        BOT: Repository created! LNK: #{bitbucket.projects_link(Services::Bitbucket::BROWSER_PREFIX)}/#{project.key}/repos/#{repository.slug}
+        BOT: Repository created! LNK: #{bitbucket.projects_link(Services::Bitbucket::BROWSER_PREFIX)}/#{project.key}/repos/#{repository.name.tr(' ', '-').downcase}
       TEXT
     end
   end
@@ -50,7 +50,7 @@ RSpec.describe Dialogs::CreateRepository do
 
     it "shows repository details" do
       expect(runtime.chat(payload = [repository.slug])).to match(<<~TEXT.strip)
-        BOT: What is Bitbucket repository name?
+        BOT: What is Bitbucket repository key?
         USR: #{payload.shift}
         BOT: Ok, #{repository.slug} repository already exist in #{project.key} project.
         BOT: Name: #{repository.name}

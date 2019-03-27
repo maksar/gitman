@@ -78,9 +78,11 @@ module Services
 
     def branch_permissions
       %w[master dev develop development prod production stage staging].each do |branch|
-        post("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-permissions/2.0/projects/#{@project}/repos/#{@repository}/restrictions",
-             type: "pull-request-only", users: [], groups: [], accessKeys: [],
-             matcher: { id: branch, displayId: branch, type: { id: "PATTERN", name: "Pattern" }, active: true })
+        %w[fast-forward-only pull-request-only no-deletes].each do |restriction|
+          post("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-permissions/2.0/projects/#{@project}/repos/#{@repository}/restrictions",
+               type: restriction, users: [], groups: [], accessKeys: [],
+               matcher: { id: branch, displayId: branch, type: { id: "PATTERN", name: "Pattern" }, active: true })
+        end
       end
     end
 

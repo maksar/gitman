@@ -99,5 +99,4 @@ If everything matches, bot will store user in `config/users.yml` file and start 
     rubocop && deep-cover clone rspec -- && open coverage/index.html
 
 ## TODO
-* disable branch deletion
 * bitbucket doesn't allow to specify slug, deal with it

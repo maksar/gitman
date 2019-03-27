@@ -73,6 +73,7 @@ Telegram uses `@BotFather` bot to create and manage bots. `@itransition_gitman_b
 
     You:
         create - Creates Bitbucket repository or changes it’s settings.
+        cancel - Cancels current command.
 
     BotFather:
         Success! Command list updated. /help

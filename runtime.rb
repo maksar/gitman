@@ -44,6 +44,10 @@ class Runtime
   end
 
   def listen(chat, text, dialog)
+    if text == "/cancel"
+      print(chat, text: "Ok, then.")
+      return @dialogs.default(nil)
+    end
     result = dialog.resume(text)
 
     return listen(chat, text, result) if result.is_a?(Fiber)

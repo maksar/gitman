@@ -14,7 +14,7 @@ What Gitman can do:
   * Assign members of the development group as default reviewers.
 * Configure default branching model of the source code repository:
   * Set recommended settings for the default branch names.
-  * Enforce usage of pull requests to push changes.
+  * Enforce usage of pull requests to push changes, disabling ability to delete or change history in important branches.
 * Enable popular Bitbucket features:
   * Turn on git LFS (Large Files Support) feature.
   * Turn on force push prohibition.

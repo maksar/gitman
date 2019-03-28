@@ -22,7 +22,7 @@ module Dialogs
     private
 
     def repository
-      @repository = request("What is Bitbucket repository name?")
+      @repository = request("What is Bitbucket repository key?")
       if (info = bitbucket.repository_info)
         reply("Ok, #{@repository} repository already exist in #{@project} project.")
         print_info(info)
@@ -34,9 +34,11 @@ module Dialogs
     end
 
     def create_repository
-      name = request("Specify repository name (human readable):")
-      ask("We are about to create repository with name '#{name}', slug '#{@repository}'") do
-        print_info(bitbucket.create_repository(name))
+      name = request("Specify human readable repository name:")
+      ask("We are about to create repository with name '#{name}'") do
+        info = bitbucket.create_repository(name)
+        @repository = info.fetch("slug")
+        print_info(info)
         reply("Repository created!", link: bitbucket.repository_link(Services::Bitbucket::BROWSER_PREFIX))
         @modify_rules.call(@project, @repository)
       end

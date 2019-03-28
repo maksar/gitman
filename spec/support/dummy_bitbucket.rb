@@ -27,7 +27,7 @@ class DummyBitbucket < Services::Bitbucket
 
   def create_repository(name)
     @conversation.service("create_repository(#{name})")
-    @repository_info = RepositoryInfo.new(@repository, slug: @repository, name: name, type: "normal")
+    @repository_info = RepositoryInfo.new(@repository, name: name, slug: name.tr(" ", "-").downcase, type: "normal")
   end
 
   def pull_requests(approvals_count, builds_count)

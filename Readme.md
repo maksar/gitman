@@ -97,7 +97,4 @@ If everything matches, bot will store user in `config/users.yml` file and start 
 
 ## Running tests
     source <(sed -r 's/([A-Z_]+)=(.*)/export \1="\2"/g' .env)
-    rubocop && deep-cover clone rspec -- && open coverage/index.html
-
-## TODO
-* bitbucket doesn't allow to specify slug, deal with it
+    rubocop && deep-cover clone -- rspec -r pathname && open coverage/index.html

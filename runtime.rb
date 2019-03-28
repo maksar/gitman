@@ -44,6 +44,8 @@ class Runtime
   end
 
   def listen(chat, text, dialog)
+    return reset(chat, "Ok, then.") if text == "/cancel"
+
     result = dialog.resume(text)
 
     return listen(chat, text, result) if result.is_a?(Fiber)
@@ -51,7 +53,11 @@ class Runtime
     print(chat, result.last)
     decide(chat, dialog, result, text)
   rescue StandardError => error
-    print(chat, text: "Something bad happens: #{error}\n#{error.message}\n#{error.backtrace}")
+    reset(chat, "Something bad happens: #{error}\n#{error.message}\n#{error.backtrace}")
+  end
+
+  def reset(chat, text)
+    print(chat, text: text)
     @dialogs.default(nil)
   end
 

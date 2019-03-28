@@ -73,6 +73,7 @@ Telegram uses `@BotFather` bot to create and manage bots. `@itransition_gitman_b
 
     You:
         create - Creates Bitbucket repository or changes it’s settings.
+        cancel - Cancels current command.
 
     BotFather:
         Success! Command list updated. /help
@@ -97,6 +98,3 @@ If everything matches, bot will store user in `config/users.yml` file and start 
 ## Running tests
     source <(sed -r 's/([A-Z_]+)=(.*)/export \1="\2"/g' .env)
     rubocop && deep-cover clone -- rspec -r pathname && open coverage/index.html
-
-## TODO
-* disable branch deletion

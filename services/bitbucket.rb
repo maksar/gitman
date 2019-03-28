@@ -71,16 +71,17 @@ module Services
 
     def commit_hooks(jira_key)
       put("#{repository_link}/settings/hooks/com.isroot.stash.plugin.yacc:yaccHook/settings",
-          commitMessageRegex: "#{jira_key}-\\d+.*", requireJiraIssue: true, ignoreUnknownIssueProjectKeys: true,
-          requireMatchingAuthorName: true, requireMatchingAuthorEmail: true, excludeMergeCommits: true)
+          commitMessageRegex: "(?s).*\\b#{jira_key}-(\\d+|X)\\b.*", requireMatchingAuthorEmail: true, excludeMergeCommits: true)
       switch("#{repository_link}/settings/hooks/com.isroot.stash.plugin.yacc:yaccHook/enabled")
     end
 
     def branch_permissions
       %w[master dev develop development prod production stage staging].each do |branch|
-        post("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-permissions/2.0/projects/#{@project}/repos/#{@repository}/restrictions",
-             type: "pull-request-only", users: [], groups: [], accessKeys: [],
-             matcher: { id: branch, displayId: branch, type: { id: "PATTERN", name: "Pattern" }, active: true })
+        %w[fast-forward-only pull-request-only no-deletes].each do |restriction|
+          post("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-permissions/2.0/projects/#{@project}/repos/#{@repository}/restrictions",
+               type: restriction, users: [], groups: [], accessKeys: [],
+               matcher: { id: branch, displayId: branch, type: { id: "PATTERN", name: "Pattern" }, active: true })
+        end
       end
     end
 

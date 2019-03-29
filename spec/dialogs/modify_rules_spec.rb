@@ -13,7 +13,9 @@ RSpec.describe Dialogs::ModifyRules do
   let(:dialog) { proc { described_class.new(DummyBitbucketFactory.new(bitbucket), active_directory).call(project.key, repository.slug) } }
   let(:project) { ProjectInfo.new("TEST", key: "TEST") }
   let(:repository) { RepositoryInfo.new("TEST", slug: "TEST") }
-  let(:active_directory) { DummyActiveDirectory.new("GROUP", ["regular"], ["with_access"], ["manager"]) }
+  let(:group) { "GROUP" }
+  let(:non_existent_group) { group + "MISSING" }
+  let(:active_directory) { DummyActiveDirectory.new(group, ["regular"], ["with_access"], ["manager"]) }
   let(:jira_key) { "JIRA_KEY" }
   let(:technical_coordinator) { "technical.coordinator" }
   let(:bitbucket) { DummyBitbucket.new(conversation, project, repository) }
@@ -39,21 +41,24 @@ RSpec.describe Dialogs::ModifyRules do
   end
 
   it "user wants to modify everything" do
-    expect(runtime.chat(payload = [yes, active_directory.group, technical_coordinator, yes, yes, yes, yes, yes, yes, yes, jira_key])).to match(<<~TEXT.strip)
+    expect(runtime.chat(payload = [yes, non_existent_group, group, technical_coordinator, yes, yes, yes, yes, yes, yes, yes, jira_key])).to match(<<~TEXT.strip)
       BOT: Do you want to set up permissions for the project? KBD: #{yes}, #{no}
       USR: #{payload.shift}
       BOT: What is the name of the project development group:
       USR: #{payload.shift}
+      BOT: Cannot find any members in group #{non_existent_group}.
+      BOT: What is the name of the project development group:
+      USR: #{payload.shift}
+      SRV: group_write_access(#{group})
       BOT: Granted write access for the group GROUP.
-      SRV: group_write_access(#{active_directory.group})
-      BOT: There is no technical coordinators in the #{active_directory.group} group.
+      BOT: There is no technical coordinators in the #{group} group.
       BOT: Username of the technical coordinator:
       USR: #{payload.shift}
-      BOT: Granted admin access for the people #{technical_coordinator}.
       SRV: personal_admin_access([#{technical_coordinator}])
+      BOT: Granted admin access for the people #{technical_coordinator}.
       BOT: Do you want to set up minimal approvals and builds? KBD: #{yes}, #{no}
       USR: #{payload.shift}
-      BOT: Group #{active_directory.group} has following members: #{active_directory.regular.first}; #{active_directory.with_access.first}; #{active_directory.managers.first}
+      BOT: Group #{group} has following members: #{active_directory.regular.first}; #{active_directory.with_access.first}; #{active_directory.managers.first}
       BOT: Only following people have access to bitbucket: #{active_directory.with_access.first}; #{active_directory.managers.first}
       BOT: Only following people are not managers: #{active_directory.with_access.first}
       BOT: Setting up minimal approvals to half of the developer's team (1) and minimal builds to 1?

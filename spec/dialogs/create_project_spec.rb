@@ -16,7 +16,7 @@ RSpec.describe Dialogs::CreateProject do
 
     it "user does not want to create project" do
       expect(runtime.chat(payload = [project.key, no])).to match(<<~TEXT.strip)
-        BOT: What is Bitbucket PROJECT name?
+        BOT: What is Bitbucket PROJECT key?
         USR: #{payload.shift}
         BOT: There is no such project.
         BOT: Do you want to create it? KBD: #{yes}, #{no}
@@ -27,7 +27,7 @@ RSpec.describe Dialogs::CreateProject do
 
     it "user wants to create a project" do
       expect(runtime.chat(payload = [project.key, yes, project.name, project.description, yes])).to match(<<~TEXT.strip)
-        BOT: What is Bitbucket PROJECT name?
+        BOT: What is Bitbucket PROJECT key?
         USR: #{payload.shift}
         BOT: There is no such project.
         BOT: Do you want to create it? KBD: #{yes}, #{no}
@@ -52,7 +52,7 @@ RSpec.describe Dialogs::CreateProject do
 
     it "shows project details" do
       expect(runtime.chat(payload = [project.key])).to match(<<~TEXT.strip)
-        BOT: What is Bitbucket PROJECT name?
+        BOT: What is Bitbucket PROJECT key?
         USR: #{payload.shift}
         BOT: Ok, #{project.key} project already exist.
         BOT: Name: #{project.name}

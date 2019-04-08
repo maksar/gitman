@@ -21,7 +21,7 @@ module Dialogs
     private
 
     def project
-      @project = request("What is Bitbucket PROJECT name?")
+      @project = request("What is Bitbucket PROJECT key?")
       if (info = bitbucket.project_info)
         reply("Ok, #{@project} project already exist.")
         print_info(info)

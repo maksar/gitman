@@ -57,9 +57,7 @@ module Dialogs
     end
 
     def group_access
-      while @active_directory.group_members(@group = request("What is the name of the project development group:")).empty?
-        reply("Cannot find any members in group #{@group}.")
-      end
+      reply("Cannot find any members in group #{@group}.") while @active_directory.group_members(@group = request("What is the name of the project development group:")).empty?
 
       bitbucket.group_write_access(@group)
       reply("Granted write access for the group #{@group}.")

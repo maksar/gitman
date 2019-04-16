@@ -43,8 +43,8 @@ module Dialogs
 
     def print_info(info)
       reply("Name: #{info.fetch('name')}")
-      reply("Description: #{info.fetch('description')}")
       reply("Type: #{info.fetch('type')}")
+      info["description"].try { |description| reply("Description: #{description}") }
     end
 
     def bitbucket

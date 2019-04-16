@@ -40,8 +40,8 @@ RSpec.describe Dialogs::CreateProject do
         USR: #{payload.shift}
         SRV: create_project(#{project.name}, #{project.description})
         BOT: Name: #{project.name}
-        BOT: Description: #{project.description}
         BOT: Type: #{project.type}
+        BOT: Description: #{project.description}
         BOT: Project created! LNK: #{bitbucket.projects_link}/#{project.key}
       TEXT
     end
@@ -56,9 +56,23 @@ RSpec.describe Dialogs::CreateProject do
         USR: #{payload.shift}
         BOT: Ok, #{project.key} project already exist.
         BOT: Name: #{project.name}
-        BOT: Description: #{project.description}
         BOT: Type: #{project.type}
+        BOT: Description: #{project.description}
       TEXT
+    end
+
+    context "but does not have a description" do
+      before { project[:description] = nil }
+
+      it "shows project details with no description" do
+        expect(runtime.chat(payload = [project.key])).to match(<<~TEXT.strip)
+          BOT: What is Bitbucket PROJECT key?
+          USR: #{payload.shift}
+          BOT: Ok, #{project.key} project already exist.
+          BOT: Name: #{project.name}
+          BOT: Type: #{project.type}
+        TEXT
+      end
     end
   end
 end

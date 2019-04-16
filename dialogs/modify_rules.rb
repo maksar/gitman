@@ -28,7 +28,7 @@ module Dialogs
     private
 
     def permissions
-      option("Do you want to set up permissions for the project?") do
+      option("Do you want to set up permissions for the repository?") do
         group_access
         admin_access
       end

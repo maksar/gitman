@@ -22,7 +22,7 @@ RSpec.describe Dialogs::ModifyRules do
 
   it "user does not want to modify anything" do
     expect(runtime.chat(payload = [no, no, no, no, no, no, no])).to match(<<~TEXT.strip)
-      BOT: Do you want to set up permissions for the project? KBD: #{yes}, #{no}
+      BOT: Do you want to set up permissions for the repository? KBD: #{yes}, #{no}
       USR: #{payload.shift}
       BOT: Do you want to set up minimal approvals and builds? KBD: #{yes}, #{no}
       USR: #{payload.shift}
@@ -42,7 +42,7 @@ RSpec.describe Dialogs::ModifyRules do
 
   it "user wants to modify everything" do
     expect(runtime.chat(payload = [yes, non_existent_group, group, technical_coordinator, yes, yes, yes, yes, yes, yes, yes, jira_key])).to match(<<~TEXT.strip)
-      BOT: Do you want to set up permissions for the project? KBD: #{yes}, #{no}
+      BOT: Do you want to set up permissions for the repository? KBD: #{yes}, #{no}
       USR: #{payload.shift}
       BOT: What is the name of the project development group:
       USR: #{payload.shift}

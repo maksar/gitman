@@ -13,4 +13,8 @@ class RepositoryInfo < ActiveSupport::HashWithIndifferentAccess
   def name
     fetch(:name)
   end
+
+  def description
+    fetch(:description)
+  end
 end

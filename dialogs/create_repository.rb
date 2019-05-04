@@ -35,8 +35,9 @@ module Dialogs
 
     def create_repository
       name = request("Specify human readable repository name:")
-      ask("We are about to create repository with name '#{name}'") do
-        info = bitbucket.create_repository(name)
+      description = request("Specify project description:")
+      ask("We are about to create repository with name '#{name}', description '#{description}'") do
+        info = bitbucket.create_repository(name, description)
         @repository = info.fetch("slug")
         print_info(info)
         reply("Repository created!", link: bitbucket.repository_link(Services::Bitbucket::BROWSER_PREFIX))
@@ -46,6 +47,7 @@ module Dialogs
 
     def print_info(info)
       reply("Name: #{info.fetch('name')}")
+      info["description"].try { |description| reply("Description: #{description}") }
     end
 
     def bitbucket

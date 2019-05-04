@@ -28,7 +28,7 @@ RSpec.describe Dialogs::CreateRepository do
     end
 
     it "user wants to create a repository" do
-      expect(runtime.chat(payload = [repository.slug, yes, repository.name, yes])).to match(<<~TEXT.strip)
+      expect(runtime.chat(payload = [repository.slug, yes, repository.name, repository.description, yes])).to match(<<~TEXT.strip)
         BOT: What is Bitbucket repository key?
         USR: #{payload.shift}
         BOT: There is no such repository in #{project.key} project.
@@ -36,10 +36,13 @@ RSpec.describe Dialogs::CreateRepository do
         USR: #{payload.shift}
         BOT: Specify human readable repository name:
         USR: #{payload.shift}
-        BOT: We are about to create repository with name '#{repository.name}' KBD: #{yes}, #{no}
+        BOT: Specify project description:
         USR: #{payload.shift}
-        SRV: create_repository(#{repository.name})
+        BOT: We are about to create repository with name '#{repository.name}', description '#{repository.description}' KBD: #{yes}, #{no}
+        USR: #{payload.shift}
+        SRV: create_repository(#{repository.name}, #{repository.description})
         BOT: Name: #{repository.name}
+        BOT: Description: #{repository.description}
         BOT: Repository created! LNK: #{bitbucket.projects_link(Services::Bitbucket::BROWSER_PREFIX)}/#{project.key}/repos/#{repository.name.tr(' ', '-').downcase}
       TEXT
     end
@@ -54,6 +57,7 @@ RSpec.describe Dialogs::CreateRepository do
         USR: #{payload.shift}
         BOT: Ok, #{repository.slug} repository already exist in #{project.key} project.
         BOT: Name: #{repository.name}
+        BOT: Description: #{repository.description}
       TEXT
     end
   end

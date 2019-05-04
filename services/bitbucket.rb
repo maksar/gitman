@@ -28,8 +28,8 @@ module Services
       post(projects_link, key: @project, name: name, description: description, public: false)
     end
 
-    def create_repository(name)
-      post("#{project_link}/repos", name: name, public: false, forkable: false)
+    def create_repository(name, description)
+      post("#{project_link}/repos", name: name, description: description, public: false, forkable: false)
     end
 
     def projects_link(prefix = API_PREFIX)

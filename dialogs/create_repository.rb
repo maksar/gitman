@@ -35,7 +35,7 @@ module Dialogs
 
     def create_repository
       name = request("Specify human readable repository name:")
-      description = request("Specify project description:")
+      description = request("Specify repository description:")
       ask("We are about to create repository with name '#{name}', description '#{description}'") do
         info = bitbucket.create_repository(name, description)
         @repository = info.fetch("slug")

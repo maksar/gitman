@@ -36,7 +36,7 @@ RSpec.describe Dialogs::CreateRepository do
         USR: #{payload.shift}
         BOT: Specify human readable repository name:
         USR: #{payload.shift}
-        BOT: Specify project description:
+        BOT: Specify repository description:
         USR: #{payload.shift}
         BOT: We are about to create repository with name '#{repository.name}', description '#{repository.description}' KBD: #{yes}, #{no}
         USR: #{payload.shift}

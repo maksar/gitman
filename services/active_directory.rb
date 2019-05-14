@@ -27,7 +27,7 @@ module Services
 
       group.member.map(&method(:dn)).flat_map do |member|
         if member.include?(", ")
-          member
+          display_name(member)
         else
           group_members(member, base)
         end
@@ -42,9 +42,13 @@ module Services
       user_groups(name).any? { |group| group.include?("Managers") }
     end
 
+    def display_name(name)
+      user = user(name, %w[displayName])
+      attribute(user, :displayName).try(&:first) || dn(user.dn)
+    end
+
     def user_info(name)
       user = user(name, %w[extensionAttribute9 mobile])
-
       { phone: attribute(user, :mobile).try(&:first), uid: attribute(user, :extensionAttribute9).try(&:first) }
     end
 
@@ -67,7 +71,8 @@ module Services
     end
 
     def find(name, base, attributes = [])
-      @ldap.search(base: base, filter: Net::LDAP::Filter.eq("cn", name), attributes: attributes, size: 1).first
+      filter = Net::LDAP::Filter.eq("cn", name) | Net::LDAP::Filter.eq("displayName", name)
+      @ldap.search(base: base, filter: filter, attributes: attributes, size: 1).first
     end
   end
 end

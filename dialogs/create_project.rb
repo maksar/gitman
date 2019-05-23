@@ -13,9 +13,7 @@ module Dialogs
     end
 
     def call
-      Fiber.new do
-        project
-      end
+      Fiber.new { project }
     end
 
     private

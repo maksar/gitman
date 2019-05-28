@@ -45,10 +45,10 @@ module Dialogs
     end
 
     def admin_access
-      administrators = @active_directory.group_members(@group) & @active_directory.group_members("Tech Coordinators", Services::ActiveDirectory::GROUPS_DN)
+      administrators = @active_directory.group_members(development_group) & @active_directory.group_members("Tech Coordinators", Services::ActiveDirectory::GROUPS_DN)
 
       if administrators.empty?
-        reply("There is no technical coordinators in the #{@group} group.")
+        reply("There is no technical coordinators in the #{development_group} group.")
         administrators = [request("Username of the technical coordinator:")]
       end
 
@@ -57,30 +57,51 @@ module Dialogs
     end
 
     def group_access
-      reply("Cannot find any members in group #{@group}.") while @active_directory.group_members(@group = request("What is the name of the project development group:")).empty?
-
-      bitbucket.group_write_access(@group)
-      reply("Granted write access for the group #{@group}.")
+      bitbucket.group_write_access(development_group)
+      reply("Granted write access for the group #{development_group}.")
     end
 
     def pull_requests
-      option("Do you want to set up minimal approvals and builds?") do
-        @group ||= request("What is the name of the project development group:")
-
-        reply("Group #{@group} has following members: #{join(members = @active_directory.group_members(@group))}")
+      option("Do you want to set up minimal approvals?") do
+        reply("Group #{development_group} has following members: #{join(members = @active_directory.group_members(development_group))}")
         reply("Only following people have access to bitbucket: #{join(members = members.select { |member| @active_directory.access?(member) })}")
         reply("Only following people are not managers: #{join(members = members.reject { |member| @active_directory.manager?(member) })}")
-
         count = (members.size / 2.0).ceil
-        reply("Setting up minimal approvals to half of the developer's team (#{count}) and minimal builds to 1?")
-        bitbucket.pull_requests(count, 1)
 
+        reply("Setting up minimal approvals to half of the developer's team (#{count}) and minimal builds to #{minimal_builds}.")
+
+        bitbucket.pull_requests(count, minimal_builds)
         default_reviewers(members, count)
       end
     end
 
     def join(members)
       members.join("; ")
+    end
+
+    def development_group
+      @development_group ||=
+        begin
+          group = request("What is the name of the project development group:")
+
+          if @active_directory.group_members(group).empty?
+            reply("Cannot find any members in group #{group}.")
+            development_group
+          else
+            group
+          end
+        end
+    end
+
+    def minimal_builds
+      @minimal_builds ||=
+        begin
+          builds_number = 0
+          option("Do you want to set up minimal builds?") do
+            builds_number = request("What is the number of builds you want to require:")
+          end
+          builds_number.to_i
+        end
     end
 
     def default_reviewers(members, count)

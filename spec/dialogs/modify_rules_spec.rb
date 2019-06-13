@@ -17,6 +17,7 @@ RSpec.describe Dialogs::ModifyRules do
   let(:non_existent_group) { group + "MISSING" }
   let(:active_directory) { DummyActiveDirectory.new(group, ["regular"], ["with_access"], ["manager"]) }
   let(:jira_key) { "JIRA_KEY" }
+  let(:builds) { "1" }
   let(:technical_coordinator) { "technical.coordinator" }
   let(:bitbucket) { DummyBitbucket.new(conversation, project, repository) }
 
@@ -24,7 +25,7 @@ RSpec.describe Dialogs::ModifyRules do
     expect(runtime.chat(payload = [no, no, no, no, no, no, no])).to match(<<~TEXT.strip)
       BOT: Do you want to set up permissions for the repository? KBD: #{yes}, #{no}
       USR: #{payload.shift}
-      BOT: Do you want to set up minimal approvals and builds? KBD: #{yes}, #{no}
+      BOT: Do you want to set up minimal approvals? KBD: #{yes}, #{no}
       USR: #{payload.shift}
       BOT: Do you want to set up default branching model? KBD: #{yes}, #{no}
       USR: #{payload.shift}
@@ -41,7 +42,7 @@ RSpec.describe Dialogs::ModifyRules do
   end
 
   it "user wants to modify everything" do
-    expect(runtime.chat(payload = [yes, non_existent_group, group, technical_coordinator, yes, yes, yes, yes, yes, yes, yes, jira_key])).to match(<<~TEXT.strip)
+    expect(runtime.chat(payload = [yes, non_existent_group, group, technical_coordinator, yes, yes, builds, yes, yes, yes, yes, yes, yes, jira_key])).to match(<<~TEXT.strip)
       BOT: Do you want to set up permissions for the repository? KBD: #{yes}, #{no}
       USR: #{payload.shift}
       BOT: What is the name of the project development group:
@@ -56,12 +57,16 @@ RSpec.describe Dialogs::ModifyRules do
       USR: #{payload.shift}
       SRV: personal_admin_access([#{technical_coordinator}])
       BOT: Granted admin access for the people #{technical_coordinator}.
-      BOT: Do you want to set up minimal approvals and builds? KBD: #{yes}, #{no}
+      BOT: Do you want to set up minimal approvals? KBD: #{yes}, #{no}
       USR: #{payload.shift}
       BOT: Group #{group} has following members: #{active_directory.regular.first}; #{active_directory.with_access.first}; #{active_directory.managers.first}
       BOT: Only following people have access to bitbucket: #{active_directory.with_access.first}; #{active_directory.managers.first}
       BOT: Only following people are not managers: #{active_directory.with_access.first}
-      BOT: Setting up minimal approvals to half of the developer's team (1) and minimal builds to 1?
+      BOT: Do you want to set up minimal builds? KBD: #{yes}, #{no}
+      USR: #{payload.shift}
+      BOT: What is the number of builds you want to require:
+      USR: #{payload.shift}
+      BOT: Setting up minimal approvals to half of the developer's team (1) and minimal builds to #{builds}.
       SRV: pull_requests(1, 1)
       BOT: Do you want to set up default reviewers? KBD: #{yes}, #{no}
       USR: #{payload.shift}

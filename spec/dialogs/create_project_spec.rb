@@ -42,7 +42,7 @@ RSpec.describe Dialogs::CreateProject do
         BOT: Name: #{project.name}
         BOT: Type: #{project.type}
         BOT: Description: #{project.description}
-        BOT: Project created! LNK: #{bitbucket.projects_link}/#{project.key}
+        BOT: Project created! LNK: #{bitbucket.projects_link(Services::Bitbucket::BROWSER_PREFIX)}/#{project.key}
       TEXT
     end
   end

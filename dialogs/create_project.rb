@@ -35,7 +35,7 @@ module Dialogs
       description = request("Specify project description:")
       ask("We are about to create project with name '#{name}', key '#{@project}', description '#{description}'") do
         print_info(bitbucket.create_project(name, description))
-        answer("Project created!", link: bitbucket.project_link)
+        answer("Project created!", link: bitbucket.project_link(Services::Bitbucket::BROWSER_PREFIX))
       end
     end
 

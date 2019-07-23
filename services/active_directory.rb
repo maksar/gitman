@@ -12,6 +12,7 @@ module Services
     PROJECT_GROUPS_DN = "OU=ProjectGroups,#{GROUPS_DN}"
     USERS_DN = "OU=Active,OU=Users,#{BASE_DN}"
     PARTNERS_DN = "OU=Partners,OU=Users,#{BASE_DN}"
+    FREELANCERS_DN = "OU=Freelancers,OU=Users,#{BASE_DN}"
 
     def initialize
       @ldap = Net::LDAP.new(
@@ -59,7 +60,7 @@ module Services
     private
 
     def user(name, attributes)
-      find(name, USERS_DN, attributes) || find(name, PARTNERS_DN, attributes)
+      find(name, USERS_DN, attributes) || find(name, PARTNERS_DN, attributes) || find(name, FREELANCERS_DN, attributes)
     end
 
     def attribute(entry, attribute)

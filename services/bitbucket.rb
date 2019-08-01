@@ -50,6 +50,7 @@ module Services
         mergeConfig: { defaultStrategy: { id: "no-ff" }, strategies: [{ id: "no-ff" }] },
         requiredAllApprovers: false, requiredApprovers: approvals_count, requiredAllTasksComplete: true, requiredSuccessfulBuilds: builds_count
       )
+      switch("#{repository_link}/settings/hooks/com.atlassian.bitbucket.server.bitbucket-bundled-hooks:needs-work-merge-check/enabled")
     end
 
     def enable_force_push

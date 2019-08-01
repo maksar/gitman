@@ -5,6 +5,7 @@ require "active_support/concern"
 require_relative "../../dialogs/base"
 require_relative "conversation"
 require_relative "dummy_runtime"
+require_relative "dummy_continuation"
 
 module DialogExampleGroup
   extend ActiveSupport::Concern
@@ -16,7 +17,7 @@ module DialogExampleGroup
     let(:no) { Dialogs::Base::NEGATIVE }
     let(:conversation) { Conversation.new }
     let(:runtime) { DummyRuntime.new(conversation, dialog) }
-    let(:continuation) { double(:continuation, method_missing: [:end, text: nil]) }
+    let(:continuation) { DummyContinuation.new }
   end
 
   RSpec.configure do |config|

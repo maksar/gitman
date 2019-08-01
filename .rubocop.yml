@@ -1,3 +1,7 @@
+require: 
+  - rubocop-rspec
+  - rubocop-performance
+
 AllCops:
   TargetRubyVersion: 2.5
 
@@ -21,3 +25,6 @@ Bundler/OrderedGems:
 
 Metrics/BlockLength:
   ExcludedMethods: ['describe', 'context']
+
+RSpec/ExampleLength:
+  Enabled: false

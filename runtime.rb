@@ -52,8 +52,8 @@ class Runtime
 
     print(chat, result.last)
     decide(chat, dialog, result, text)
-  rescue StandardError => error
-    reset(chat, "Something bad happens: #{error}\n#{error.message}\n#{error.backtrace}")
+  rescue StandardError => e
+    reset(chat, "Something bad happens: #{e}\n#{e.message}\n#{e.backtrace}")
   end
 
   def reset(chat, text)

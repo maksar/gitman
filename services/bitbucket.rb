@@ -71,7 +71,7 @@ module Services
 
     def commit_hooks(jira_key)
       put("#{repository_link}/settings/hooks/com.isroot.stash.plugin.yacc:yaccHook/settings",
-          commitMessageRegex: "(?s).*\\b#{jira_key}-(\\d+|X)\\b.*", requireMatchingAuthorEmail: true, excludeMergeCommits: true)
+          commitMessageRegex: "((?s).*\\b#{jira_key}-(\\d+|X)\\b.*)|((?s)^TeamCity change in.*)", requireMatchingAuthorEmail: true, excludeMergeCommits: true)
       switch("#{repository_link}/settings/hooks/com.isroot.stash.plugin.yacc:yaccHook/enabled")
     end
 

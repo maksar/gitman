@@ -61,7 +61,7 @@ RSpec.describe Dialogs::CreateProject do
       TEXT
     end
 
-    context "but does not have a description" do
+    context "when does not have a description" do
       before { project[:description] = nil }
 
       it "shows project details with no description" do

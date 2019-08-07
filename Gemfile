@@ -10,6 +10,8 @@ gem "net-ldap"
 group :development do
   gem "pry"
   gem "rubocop"
+  gem "rubocop-performance"
+  gem "rubocop-rspec"
   gem "rspec"
   gem "deep-cover"
 end

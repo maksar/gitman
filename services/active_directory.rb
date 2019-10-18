@@ -26,9 +26,9 @@ module Services
       group = find(name, base, ["member"])
       return [] unless attribute(group, :member)
 
-      group.member.map(&method(:dn)).select { |member| user(member, "dn") }.flat_map do |member|
+      group.member.map(&method(:dn)).flat_map do |member|
         if member.include?(", ")
-          display_name(member)
+          user(member, "dn") && display_name(member)
         else
           group_members(member, base)
         end

@@ -2,6 +2,6 @@
 
 class DummyContinuation
   def call(*_)
-    [:end, text: nil]
+    :end
   end
 end

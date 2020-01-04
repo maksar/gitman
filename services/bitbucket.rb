@@ -115,21 +115,25 @@ module Services
     end
 
     def post(url, data)
-      JSON.parse(RestClient.post(url, data.to_json, headers).body)
+      JSON.parse(request(url, :post, payload: data.to_json).body)
     end
 
     def put(url, data)
-      JSON.parse(RestClient.put(url, data.to_json, headers).body)
+      JSON.parse(request(url, :put, payload: data.to_json).body)
     end
 
     def switch(url)
-      RestClient.put(url, "", headers)
+      request(url, :put, payload: "")
     end
 
     def get(url)
-      JSON.parse(RestClient.get(url, headers).body)
+      JSON.parse(request(url, :get).body)
     rescue RestClient::NotFound
       nil
+    end
+
+    def request(url, method, params = {})
+      RestClient::Request.execute(params.merge(url: url, method: method, headers: headers, ssl_ca_file: ENV.fetch("GITMAN_BITBUCKET_CERTIFICATE"), verify_ssl: OpenSSL::SSL::VERIFY_PEER))
     end
   end
 end

@@ -22,7 +22,7 @@ RSpec.describe Dialogs::ModifyRules do
   let(:bitbucket) { DummyBitbucket.new(conversation, project, repository) }
 
   it "user does not want to modify anything" do
-    expect(runtime.chat(payload = [no, no, no, no, no, no, no])).to match(<<~TEXT.strip)
+    expect(runtime.chat(payload = [no, no, no, no, no, no, no])).to chat_match(<<~TEXT)
       BOT: Do you want to set up permissions for the repository? KBD: #{yes}, #{no}
       USR: #{payload.shift}
       BOT: Do you want to set up minimal approvals? KBD: #{yes}, #{no}
@@ -42,7 +42,7 @@ RSpec.describe Dialogs::ModifyRules do
   end
 
   it "user wants to modify everything" do
-    expect(runtime.chat(payload = [yes, non_existent_group, group, technical_coordinator, yes, yes, builds, yes, yes, yes, yes, yes, yes, jira_key])).to match(<<~TEXT.strip)
+    expect(runtime.chat(payload = [yes, non_existent_group, group, technical_coordinator, yes, yes, builds, yes, yes, yes, yes, yes, yes, jira_key])).to chat_match(<<~TEXT)
       BOT: Do you want to set up permissions for the repository? KBD: #{yes}, #{no}
       USR: #{payload.shift}
       BOT: What is the name of the project development group:

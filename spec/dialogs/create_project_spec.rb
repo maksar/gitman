@@ -8,14 +8,14 @@ require_relative "../support/dummy_bitbucket_factory"
 require_relative "../support/dummy_bitbucket"
 
 RSpec.describe Dialogs::CreateProject do
-  let(:dialog) { proc { described_class.new(DummyBitbucketFactory.new(bitbucket), continuation).call } }
+  let(:dialog) { proc { described_class.new(DummyBitbucketFactory.new(bitbucket), termination).call } }
   let(:project) { ProjectInfo.new("TEST", key: "TEST", name: "Test Project", description: "Test Project description", type: "normal") }
 
   context "when project does not exist" do
     let(:bitbucket) { DummyBitbucket.new(conversation, nil, nil) }
 
     it "user does not want to create project" do
-      expect(runtime.chat(payload = [project.key, no])).to match(<<~TEXT.strip)
+      expect(runtime.chat(payload = [project.key, no])).to chat_match(<<~TEXT)
         BOT: What is Bitbucket PROJECT key?
         USR: #{payload.shift}
         BOT: There is no such project.
@@ -26,7 +26,7 @@ RSpec.describe Dialogs::CreateProject do
     end
 
     it "user wants to create a project" do
-      expect(runtime.chat(payload = [project.key, yes, project.name, project.description, yes])).to match(<<~TEXT.strip)
+      expect(runtime.chat(payload = [project.key, yes, project.name, project.description, yes])).to chat_match(<<~TEXT)
         BOT: What is Bitbucket PROJECT key?
         USR: #{payload.shift}
         BOT: There is no such project.
@@ -51,7 +51,7 @@ RSpec.describe Dialogs::CreateProject do
     let(:bitbucket) { DummyBitbucket.new(conversation, project, nil) }
 
     it "shows project details" do
-      expect(runtime.chat(payload = [project.key])).to match(<<~TEXT.strip)
+      expect(runtime.chat(payload = [project.key])).to chat_match(<<~TEXT)
         BOT: What is Bitbucket PROJECT key?
         USR: #{payload.shift}
         BOT: Ok, #{project.key} project already exist.
@@ -65,7 +65,7 @@ RSpec.describe Dialogs::CreateProject do
       before { project[:description] = nil }
 
       it "shows project details with no description" do
-        expect(runtime.chat(payload = [project.key])).to match(<<~TEXT.strip)
+        expect(runtime.chat(payload = [project.key])).to chat_match(<<~TEXT)
           BOT: What is Bitbucket PROJECT key?
           USR: #{payload.shift}
           BOT: Ok, #{project.key} project already exist.

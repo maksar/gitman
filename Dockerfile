@@ -1,13 +1,19 @@
-FROM ruby:2.6.3 as ruby
+FROM ruby:2.7.0 as ruby
 
 WORKDIR /app
 COPY Gemfile* /app/
-RUN bundle install --deployment --without=development --frozen --standalone=default --no-cache --path vendor/bundle
+RUN bundle config --local deployment 'true'
+RUN bundle config --local frozen 'true'
+RUN bundle config --local no-cache 'true'
+RUN bundle config --local clean 'true'
+RUN bundle config --local without 'development'
+RUN bundle config --local path 'vendor/bundle'
+RUN bundle install
 RUN mkdir .bundle && cp /usr/local/bundle/config .bundle/config
-RUN rm -rf vendor/bundle/ruby/2.6.0/cache vendor/bundle/ruby/2.6.0/bin
+RUN rm -rf vendor/bundle/ruby/2.7.0/cache vendor/bundle/ruby/2.7.0/bin
 
 
-FROM gcr.io/distroless/base as distroless
+FROM gcr.io/distroless/base-debian10 as distroless
 
 COPY --from=ruby /app /app
 
@@ -37,5 +43,6 @@ COPY services /app/services/
 COPY *.rb /app/
 
 ENV SSL_CERT_FILE /etc/ssl/certs/ca-certificates.crt
+ENV RUBYOPT -W:no-deprecated -W:no-experimental
 
 CMD ["bundle", "exec", "ruby", "server.rb"]

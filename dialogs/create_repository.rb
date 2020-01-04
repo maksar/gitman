@@ -14,9 +14,7 @@ module Dialogs
 
     def call(project)
       @project = project
-      Fiber.new do
-        repository
-      end
+      Fiber.new { repository }
     end
 
     private

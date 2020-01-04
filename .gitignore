@@ -1,6 +1,6 @@
 *.env*
+!.env.example
 .idea/
 coverage/
-deep_cover/
 config/*.yml
 config/*.cer

@@ -9,9 +9,9 @@ gem "net-ldap"
 
 group :development do
   gem "pry"
-  gem "rubocop"
+  gem "rubocop", github: "maksar/rubocop", ref: "db9f1c"
   gem "rubocop-performance"
   gem "rubocop-rspec"
   gem "rspec"
-  gem "deep-cover"
+  gem "simplecov"
 end

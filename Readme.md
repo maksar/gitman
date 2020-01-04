@@ -97,4 +97,4 @@ If everything matches, bot will store user in `config/users.yml` file and start 
 
 ## Running tests
     source <(sed -E 's/([A-Z_]+)=(.*)/\1=\2/g' .env | sed -E 's/ /\\ /g' | sed -E 's/^/export /g')
-    rubocop && deep-cover clone -- rspec -r pathname && open coverage/index.html
+    rubocop && rspec && open coverage/index.html

@@ -10,10 +10,9 @@ module Dialogs
     private
 
     def ask(question, negative = -> { answer("Ok then.") })
-      if request(question, answers: [[POSITIVE, NEGATIVE]]) == POSITIVE
-        yield
-      else
-        negative.call
+      case request(question, answers: [[POSITIVE, NEGATIVE]])
+      in POSITIVE then yield
+      else negative.call
       end
     end
 
@@ -21,17 +20,17 @@ module Dialogs
       ask(question, -> {}, &block)
     end
 
-    def request(question, answers: nil, link: nil)
-      Fiber.yield(:question, text: question, answers: answers, link: link)
+    def request(question, params = {})
+      Fiber.yield(:question, params.merge(text: question))
     end
 
-    def reply(statement, link: nil)
-      Fiber.yield(:statement, text: statement, link: link)
+    def reply(statement, params = {})
+      Fiber.yield(:statement, params.merge(text: statement))
     end
 
-    def answer(answer, link: nil)
-      request(answer, link: link)
-      Fiber.yield(:end, text: nil)
+    def answer(answer, params = {})
+      request(answer, params)
+      Fiber.yield(:end)
     end
   end
 end

@@ -31,7 +31,7 @@ class DummyRuntime < Runtime
   private
 
   def decide(chat, dialog, result, text)
-    return if result.first == :end
+    return if result == :end
 
     super
   end

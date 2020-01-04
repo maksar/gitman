@@ -46,12 +46,13 @@ class Runtime
   def listen(chat, text, dialog)
     return reset(chat, "Ok, then.") if text == "/cancel"
 
-    result = dialog.resume(text)
-
-    return listen(chat, text, result) if result.is_a?(Fiber)
-
-    print(chat, result.last)
-    decide(chat, dialog, result, text)
+    case (result = dialog.resume(text))
+    in [:question | :statement, payload]
+      print(chat, payload)
+      decide(chat, dialog, result, text)
+    in Fiber then listen(chat, text, result)
+    else decide(chat, dialog, result, text)
+    end
   rescue StandardError => e
     reset(chat, "Something bad happens: #{e}\n#{e.message}\n#{e.backtrace}")
   end
@@ -62,30 +63,24 @@ class Runtime
   end
 
   def decide(chat, dialog, result, text)
-    case result.first
-    when :question then dialog
-    when :statement then listen(chat, text, dialog)
-    when :end then listen(chat, text, @dialogs.default(nil))
-    else print(chat, text: "Unknown internal command: #{result.first}.")
+    case result
+    in [:question, *] then dialog
+    in [:statement, *] then listen(chat, text, dialog)
+    in :end then listen(chat, text, @dialogs.default(nil))
+    in command then print(chat, text: "Unknown internal command: #{command}")
     end
   end
 
   def print(chat, payload)
-    payload.fetch(:text).try do |text|
-      @bot.api.send_message(chat_id: chat, text: text, reply_markup: reply_markup(payload))
-    end
+    @bot.api.send_message(chat_id: chat, text: payload.fetch(:text), reply_markup: reply_markup(payload))
   end
 
   def reply_markup(payload)
-    payload[:contact].try do |contact|
-      Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: [Telegram::Bot::Types::KeyboardButton.new(text: contact, request_contact: true)], one_time_keyboard: true)
-    end ||
-      payload[:link].try do |link|
-        Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: [Telegram::Bot::Types::InlineKeyboardButton.new(text: payload.fetch(:text), url: link)])
-      end ||
-      payload[:answers].try do |answers|
-        Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: answers, one_time_keyboard: true)
-      end ||
-      Telegram::Bot::Types::ReplyKeyboardMarkup.new(remove_keyboard: true)
+    case payload
+    in { contact: } then Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: [Telegram::Bot::Types::KeyboardButton.new(text: contact, request_contact: true)], one_time_keyboard: true)
+    in { link:, text: } then Telegram::Bot::Types::InlineKeyboardMarkup.new(inline_keyboard: [Telegram::Bot::Types::InlineKeyboardButton.new(text: text, url: link)])
+    in { answers: } then Telegram::Bot::Types::ReplyKeyboardMarkup.new(keyboard: answers, one_time_keyboard: true)
+    else Telegram::Bot::Types::ReplyKeyboardRemove.new(remove_keyboard: true)
+    end
   end
 end

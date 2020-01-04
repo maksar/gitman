@@ -17,10 +17,16 @@ module DialogExampleGroup
     let(:no) { Dialogs::Base::NEGATIVE }
     let(:conversation) { Conversation.new }
     let(:runtime) { DummyRuntime.new(conversation, dialog) }
-    let(:continuation) { DummyContinuation.new }
+    let(:termination) { DummyContinuation.new }
   end
 
   RSpec.configure do |config|
     config.include(self, type: :dialog, file_path: %r{spec/dialogs})
+  end
+end
+
+RSpec::Matchers.define :chat_match do |expected|
+  match do |actual|
+    actual.strip == expected.strip
   end
 end

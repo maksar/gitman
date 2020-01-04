@@ -133,7 +133,7 @@ module Services
     end
 
     def request(url, method, params = {})
-      RestClient::Request.execute(params.merge(url: url, method: method, headers: headers, ssl_ca_file: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_CERTIFICATE"), verify_ssl: OpenSSL::SSL::VERIFY_PEER))
+      RestClient::Request.execute(params.merge(url: url, method: method, headers: headers, ssl_ca_file: ENV.fetch("GITMAN_BITBUCKET_CERTIFICATE"), verify_ssl: OpenSSL::SSL::VERIFY_PEER))
     end
   end
 end

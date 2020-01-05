@@ -13,5 +13,5 @@ group :development do
   gem "rubocop-performance"
   gem "rubocop-rspec"
   gem "rspec"
-  gem "simplecov"
+  gem "simplecov", ">= 0.18.0.beta1"
 end

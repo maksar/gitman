@@ -45,10 +45,8 @@ module Dialogs
     end
 
     def admin_access
-      administrators = @active_directory.group_members(development_group) & @active_directory.group_members("Tech Coordinators", Services::ActiveDirectory::GROUPS_DN)
-
-      if administrators.empty?
-        reply("There is no technical coordinators in the #{development_group} group.")
+      if (administrators = @active_directory.group_members(development_group) & @active_directory.technical_coordinators).empty?
+        reply("There are no technical coordinators in the #{development_group} group.")
         administrators = [request("Username of the technical coordinator:")]
       end
 

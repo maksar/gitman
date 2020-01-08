@@ -14,6 +14,8 @@ module Services
     PARTNERS_DN = "OU=Partners,OU=Users,#{BASE_DN}"
     FREELANCERS_DN = "OU=Freelancers,OU=Users,#{BASE_DN}"
 
+    TECHNICAL_COORDINATORS_GROUP = "Technical Coordinators"
+
     def initialize
       @ldap = Net::LDAP.new(
         host: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_ADDRESS"), port: ENV.fetch("GITMAN_ACTIVE_DIRECTORY_PORT").to_i,
@@ -55,6 +57,10 @@ module Services
 
     def user_groups(name)
       attribute(user(name, ["memberof"]), :memberof)
+    end
+
+    def technical_coordinators
+      group_members(TECHNICAL_COORDINATORS_GROUP, Services::ActiveDirectory::GROUPS_DN)
     end
 
     private

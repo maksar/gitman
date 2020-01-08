@@ -3,23 +3,24 @@
 require_relative "../../services/active_directory"
 
 class DummyActiveDirectory < Services::ActiveDirectory
-  def initialize(group, regular, with_access, managers)
+  def initialize(group, regular, with_access, managers, technical_coordinators)
     @group = group
     @regular = regular
     @with_access = with_access
     @managers = managers
+    @technical_coordinators = technical_coordinators
   end
 
-  attr_reader :group, :regular, :with_access, :managers
+  attr_reader :technical_coordinators
 
   def group_members(name, _base = nil)
     return [] unless name == @group
 
-    @regular + @with_access + @managers
+    @regular + @with_access + @managers + @technical_coordinators
   end
 
   def access?(name)
-    (@with_access + @managers).include?(name)
+    (@with_access + @managers + @technical_coordinators).include?(name)
   end
 
   def manager?(name)

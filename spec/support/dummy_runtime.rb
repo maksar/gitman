@@ -24,10 +24,6 @@ class DummyRuntime < Runtime
     super
   end
 
-  def logged_as?(chat)
-    @conversation.text == chat.lines.map(&:strip)
-  end
-
   private
 
   def decide(chat, dialog, result, text)
@@ -37,6 +33,6 @@ class DummyRuntime < Runtime
   end
 
   def print(_chat, message)
-    @conversation.bot(message) if message.fetch(:text)
+    @conversation.bot(message)
   end
 end

@@ -21,15 +21,21 @@ RSpec.describe Dialogs::Default do
   end
 
   context "when continuation cycles" do
-    let(:dialog) { proc { Dialogs::Endless.new({}).call } }
+    let(:dialog_instance) { Dialogs::Endless.new(3, "/known" => dialog) }
+    let(:dialog) { proc { dialog_instance.call } }
 
-    it "continues to ask questions" do
-      expect(runtime.chat(payload = ["/whatever"])).to chat_match(<<~TEXT)
-        BOT: What can I do for you?
-        USR: #{payload.shift}
-        BOT: What can I do for you?
-      TEXT
+    shared_examples "continues to ask questions" do |command|
+      it "continues to ask questions" do
+        expect(runtime.chat(payload = [command])).to chat_match(<<~TEXT)
+          BOT: What can I do for you?
+          USR: #{payload.shift}
+          BOT: What can I do for you?
+        TEXT
+      end
     end
+
+    it_behaves_like "continues to ask questions", "/known"
+    it_behaves_like "continues to ask questions", "/unknown"
   end
 
   context "when continuation produces unknown command" do

@@ -29,4 +29,6 @@ RSpec::Matchers.define :chat_match do |expected|
   match do |actual|
     actual.strip == expected.strip
   end
+
+  diffable
 end

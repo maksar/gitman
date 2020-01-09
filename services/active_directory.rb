@@ -14,7 +14,7 @@ module Services
     PARTNERS_DN = "OU=Partners,OU=Users,#{BASE_DN}"
     FREELANCERS_DN = "OU=Freelancers,OU=Users,#{BASE_DN}"
 
-    TECHNICAL_COORDINATORS_GROUP = "Technical Coordinators"
+    TECHNICAL_COORDINATORS_GROUP = "Tech Coordinators"
 
     def initialize
       @ldap = Net::LDAP.new(

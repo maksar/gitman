@@ -21,7 +21,7 @@ module Services
 
     def allowed?(uid)
       @store.transaction do
-        @store.key?(uid)
+        @store[uid]
       end
     end
 

@@ -9,10 +9,15 @@ module Services
   class ActiveDirectory
     BASE_DN = "OU=Itransition,DC=itransition,DC=corp"
     GROUPS_DN = "OU=Groups,#{BASE_DN}"
+
     PROJECT_GROUPS_DN = "OU=ProjectGroups,#{GROUPS_DN}"
+    A1QA_GROUPS_DN = "OU=A1QA.com,#{GROUPS_DN}"
+
     USERS_DN = "OU=Active,OU=Users,#{BASE_DN}"
     PARTNERS_DN = "OU=Partners,OU=Users,#{BASE_DN}"
     FREELANCERS_DN = "OU=Freelancers,OU=Users,#{BASE_DN}"
+
+    GIT_LICENSED_GROUP_DN = "CN=Git.Users.Licensed,OU=ServiceGroups,#{GROUPS_DN}"
 
     TECHNICAL_COORDINATORS_GROUP = "Tech Coordinators"
 
@@ -24,21 +29,12 @@ module Services
       ).tap(&:bind)
     end
 
-    def group_members(name, base = PROJECT_GROUPS_DN)
-      group = find(name, base, ["member"])
-      return [] unless attribute(group, :member)
-
-      group.member.map(&method(:dn)).flat_map do |member|
-        if member.include?(", ")
-          user(member, "dn") && display_name(member)
-        else
-          group_members(member, base)
-        end
-      end.compact.uniq
+    def project_group_members(name)
+      [PROJECT_GROUPS_DN, A1QA_GROUPS_DN].map { |base| group_members(name, base) }.flatten
     end
 
     def access?(name)
-      user_groups(name).include?("CN=Git.Users.Licensed,OU=ServiceGroups,OU=Groups,#{BASE_DN}")
+      user_groups(name).include?(GIT_LICENSED_GROUP_DN)
     end
 
     def manager?(name)
@@ -60,10 +56,23 @@ module Services
     end
 
     def technical_coordinators
-      group_members(TECHNICAL_COORDINATORS_GROUP, Services::ActiveDirectory::GROUPS_DN)
+      group_members(TECHNICAL_COORDINATORS_GROUP, GROUPS_DN)
     end
 
     private
+
+    def group_members(name, base)
+      group = find(name, base, ["member"])
+      return [] unless attribute(group, :member)
+
+      group.member.map(&method(:dn)).flat_map do |member|
+        if member.include?(", ")
+          user(member, "dn") && display_name(member)
+        else
+          group_members(member, base)
+        end
+      end.compact.uniq
+    end
 
     def user(name, attributes)
       find(name, USERS_DN, attributes) || find(name, PARTNERS_DN, attributes) || find(name, FREELANCERS_DN, attributes)

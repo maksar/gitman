@@ -45,7 +45,7 @@ module Dialogs
     end
 
     def admin_access
-      if (administrators = @active_directory.group_members(development_group) & @active_directory.technical_coordinators).empty?
+      if (administrators = @active_directory.project_group_members(development_group) & @active_directory.technical_coordinators).empty?
         reply("There are no technical coordinators in the #{development_group} group.")
         administrators = [request("Username of the technical coordinator:")]
       end
@@ -61,7 +61,7 @@ module Dialogs
 
     def pull_requests
       option("Do you want to set up minimal approvals?") do
-        reply("Group #{development_group} has following members: #{join(members = @active_directory.group_members(development_group))}")
+        reply("Group #{development_group} has following members: #{join(members = @active_directory.project_group_members(development_group))}")
         reply("Only following people have access to bitbucket: #{join(members = members.select { |member| @active_directory.access?(member) })}")
         reply("Only following people are not managers: #{join(members = members.reject { |member| @active_directory.manager?(member) })}")
         count = (members.size / 2.0).ceil
@@ -82,7 +82,7 @@ module Dialogs
         begin
           group = request("What is the name of the project development group:")
 
-          if @active_directory.group_members(group).empty?
+          if @active_directory.project_group_members(group).empty?
             reply("Cannot find any members in group #{group}.")
             development_group
           else

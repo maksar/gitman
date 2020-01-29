@@ -13,7 +13,7 @@ class DummyActiveDirectory < Services::ActiveDirectory
 
   attr_reader :technical_coordinators
 
-  def group_members(name, _base = nil)
+  def project_group_members(name)
     return [] unless name == @group
 
     @regular + @with_access + @managers + @technical_coordinators

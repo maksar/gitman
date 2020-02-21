@@ -15,8 +15,6 @@ RUN rm -rf vendor/bundle/ruby/2.7.0/cache vendor/bundle/ruby/2.7.0/bin
 
 FROM gcr.io/distroless/base-debian10 as distroless
 
-COPY --from=ruby /app /app
-
 COPY --from=ruby /lib/x86_64-linux-gnu/libz.so.* /lib/x86_64-linux-gnu/
 COPY --from=ruby /usr/lib/x86_64-linux-gnu/libyaml* /usr/lib/x86_64-linux-gnu/
 COPY --from=ruby /usr/lib/x86_64-linux-gnu/libgmp* /usr/lib/x86_64-linux-gnu/
@@ -27,7 +25,7 @@ COPY --from=ruby /usr/local/bin/bundle /usr/local/bin/bundle
 
 FROM scratch
 
-COPY --from=distroless /app /app
+COPY --from=ruby /app /app
 
 COPY --from=distroless /lib /lib
 COPY --from=distroless /lib64 /lib64

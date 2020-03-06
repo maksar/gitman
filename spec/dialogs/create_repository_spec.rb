@@ -10,8 +10,8 @@ require_relative "../support/dummy_bitbucket"
 
 RSpec.describe Dialogs::CreateRepository do
   let(:dialog) { proc { described_class.new(DummyBitbucketFactory.new(bitbucket), termination).call(project.key) } }
-  let(:project) { ProjectInfo.new("TEST", key: "TEST") }
-  let(:repository) { RepositoryInfo.new("TEST", key: "TEST", name: "Test Repository", description: "Test Repository description", type: "normal") }
+  let(:project) { ProjectInfo.new("PROJ") }
+  let(:repository) { RepositoryInfo.new("REPO", name: "Test Repository", description: "Test Repository description", type: "normal") }
 
   context "when repository does not exist" do
     let(:bitbucket) { DummyBitbucket.new(conversation, nil, nil) }

@@ -11,8 +11,8 @@ require_relative "../support/dummy_active_directory"
 
 RSpec.describe Dialogs::ModifyRules do
   let(:dialog) { proc { described_class.new(DummyBitbucketFactory.new(bitbucket), active_directory).call(project.key, repository.slug) } }
-  let(:project) { ProjectInfo.new("TEST", key: "TEST") }
-  let(:repository) { RepositoryInfo.new("TEST", slug: "TEST") }
+  let(:project) { ProjectInfo.new("PROJ") }
+  let(:repository) { RepositoryInfo.new("REPO") }
   let(:technical_coordinator) { "technical.coordinator" }
   let(:regular_user) { "regular" }
   let(:user_with_access) { "with_access" }

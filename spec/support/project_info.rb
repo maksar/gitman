@@ -3,7 +3,7 @@
 require "active_support/core_ext/hash/indifferent_access"
 
 class ProjectInfo < ActiveSupport::HashWithIndifferentAccess
-  def initialize(key, hash)
+  def initialize(key, hash = {})
     super(hash)
     @key = key
   end

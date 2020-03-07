@@ -21,11 +21,12 @@ What Gitman can do:
 * Install various push hooks:
   * Verification of the commit message to contain JIRA task key.
   * Requirement for the committer email and username to match Bitbucket user setting.
+* Delete (archive) project or repository.
 
 ### Requirements
 
 * Telegram account
-* ruby 2.6
+* ruby 2.7
 * `.env` with correct values for keys from `.env.example`
 * `config/users.yml` with correct values for allowed users from `config/users.yml.example`
 
@@ -73,6 +74,8 @@ Telegram uses `@BotFather` bot to create and manage bots. `@itransition_gitman_b
 
     You:
         create - Creates Bitbucket repository or changes it’s settings.
+        close - Closes Bitbucket project or repository.
+        reopen - Re-opens Bitbucket project or repository.
         cancel - Cancels current command.
 
     BotFather:
@@ -80,9 +83,9 @@ Telegram uses `@BotFather` bot to create and manage bots. `@itransition_gitman_b
 
 ## Authentication
 
-`config/users.yml` file contains list of allowed users in a format `Lastname, Firstname`. 
+`config/users.yml` file contains list of allowed users in a format `Lastname, Firstname`.
 Bot will ask to send user's contact. Then it will check ActiveDirectory for user's fist and last name, phone number and uid (in `extensionAttribute9` field).
-If everything matches, bot will store user in `config/users.yml` file and start talking to him. 
+If everything matches, bot will store user in `config/users.yml` file and start talking to him.
 
 ## Running
 

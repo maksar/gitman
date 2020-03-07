@@ -8,8 +8,11 @@ require "active_support/core_ext/object/try"
 
 module Services
   class Bitbucket
-    API_PREFIX = "/rest/api/1.0/projects"
-    BROWSER_PREFIX = "/projects"
+    API_PREFIX = "/rest/api/1.0"
+    BROWSER_PREFIX = ""
+
+    CLOSED_REPOSITORY_PREFIX = "CLOSED_"
+    CLOSED_PROJECT_PREFIX = "[Closed] "
 
     def initialize(project, repository)
       @project = project
@@ -33,7 +36,7 @@ module Services
     end
 
     def projects_link(prefix = API_PREFIX)
-      ENV.fetch("GITMAN_BITBUCKET_URL") + prefix
+      ENV.fetch("GITMAN_BITBUCKET_URL") + prefix + "/projects"
     end
 
     def project_link(prefix = API_PREFIX)
@@ -45,11 +48,9 @@ module Services
     end
 
     def pull_requests(approvals_count, builds_count)
-      post(
-        "#{repository_link}/settings/pull-requests",
-        mergeConfig: { defaultStrategy: { id: "no-ff" }, strategies: [{ id: "no-ff" }] },
-        requiredAllApprovers: false, requiredApprovers: approvals_count, requiredAllTasksComplete: true, requiredSuccessfulBuilds: builds_count
-      )
+      post("#{repository_link}/settings/pull-requests",
+           mergeConfig: { defaultStrategy: { id: "no-ff" }, strategies: [{ id: "no-ff" }] },
+           requiredAllApprovers: false, requiredApprovers: approvals_count, requiredAllTasksComplete: true, requiredSuccessfulBuilds: builds_count)
       switch("#{repository_link}/settings/hooks/com.atlassian.bitbucket.server.bitbucket-bundled-hooks:needs-work-merge-check/enabled")
     end
 
@@ -98,20 +99,67 @@ module Services
     end
 
     def personal_admin_access(administrators)
-      administrators.map do |administrator|
-        switch("#{repository_link}/permissions/users?permission=REPO_ADMIN&name=#{CGI.escape(user(administrator)['name'])}")
+      administrators.map { |administrator| switch("#{repository_link}/permissions/users?permission=REPO_ADMIN&name=#{CGI.escape(user(administrator)['name'])}") }
+    end
+
+    def close_repository
+      close(&method(:repository_link))
+    end
+
+    def reopen_repository
+      reopen(&method(:repository_link))
+      reopen(&method(:project_link))
+    end
+
+    def close_project
+      close(&method(:project_link))
+      open_repositories.each do |repo|
+        @repository = repo["slug"]
+        close(&method(:repository_link))
       end
     end
 
+    def reopen_project
+      reopen(&method(:project_link))
+      closed_repositories.each do |repo|
+        @repository = repo["slug"]
+        reopen(&method(:repository_link))
+      end
+    end
+
+    def open_repositories
+      repositories.reject { |repo| repo["name"].start_with?(CLOSED_REPOSITORY_PREFIX) }
+    end
+
+    def closed_repositories
+      repositories.select { |repo| repo["name"].start_with?(CLOSED_REPOSITORY_PREFIX) }
+    end
+
     private
+
+    def repositories
+      get(project_link + "/repos?limit=100").fetch("values", [])
+    end
+
+    def reopen
+      get(yield).tap { |info| put(yield, name: info["name"].to_s.delete_prefix(CLOSED_REPOSITORY_PREFIX), description: info["description"].to_s.delete_prefix(CLOSED_PROJECT_PREFIX)) }
+    end
+
+    def close
+      [["#{yield}/permissions/groups", proc { |info| "#{yield}/permissions/groups?name=#{CGI.escape(info['group']['name'])}" }],
+       ["#{yield}/permissions/users", proc { |info| "#{yield}/permissions/users?name=#{CGI.escape(info['user']['name'])}" }],
+       ["#{yield('/rest/keys/1.0')}/ssh", proc { |info| "#{yield('/rest/keys/1.0')}/ssh/#{info['key']['id']}" }]].each do |get_url, delete_url|
+        get(get_url + "?limit=100").fetch("values", []).each { |info| delete(delete_url.call(info)) }
+      end
+      get(yield).tap { |info| put(yield, name: CLOSED_REPOSITORY_PREFIX + info["name"].to_s, description: CLOSED_PROJECT_PREFIX + info["description"].to_s) }
+    end
 
     def user(full_name)
       get("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/api/1.0/admin/users?filter=#{CGI.escape(full_name)}").try { |result| result["values"] }.try(&:first)
     end
 
     def headers
-      auth = Base64.encode64([ENV.fetch("GITMAN_BITBUCKET_USERNAME"), ENV.fetch("GITMAN_BITBUCKET_PASSWORD")].join(":")).strip
-      { Authorization: "Basic #{auth}", content_type: :json }
+      { Authorization: "Basic #{Base64.encode64([ENV.fetch('GITMAN_BITBUCKET_USERNAME'), ENV.fetch('GITMAN_BITBUCKET_PASSWORD')].join(':')).strip}", content_type: :json }
     end
 
     def post(url, data)
@@ -120,6 +168,10 @@ module Services
 
     def put(url, data)
       JSON.parse(request(url, :put, payload: data.to_json).body)
+    end
+
+    def delete(url)
+      request(url, :delete)
     end
 
     def switch(url)
@@ -134,6 +186,8 @@ module Services
 
     def request(url, method, params = {})
       RestClient::Request.execute(params.merge(url: url, method: method, headers: headers, ssl_ca_file: ENV.fetch("GITMAN_BITBUCKET_CERTIFICATE"), verify_ssl: OpenSSL::SSL::VERIFY_PEER))
+    rescue RestClient::TemporaryRedirect => e
+      e.response.follow_redirection
     end
   end
 end

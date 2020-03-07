@@ -5,15 +5,17 @@ require_relative "project_info"
 require_relative "repository_info"
 
 class DummyBitbucket < Services::Bitbucket
-  def initialize(conversation, project_info, repository_info)
+  def initialize(conversation, project_info, repository_info, repositories = [])
     super(project_info&.key, repository_info&.slug)
     @conversation = conversation
     @project_info = project_info
     @repository_info = repository_info
+    @repositories = repositories
   end
 
   attr_reader :project_info
   attr_reader :repository_info
+  attr_reader :repositories
 
   def assign(project, repository)
     @project = project
@@ -22,12 +24,12 @@ class DummyBitbucket < Services::Bitbucket
 
   def create_project(name, description)
     @conversation.service("create_project(#{name}, #{description})")
-    @project_info = ProjectInfo.new(@project, key: @project, name: name, description: description, type: "normal")
+    @project_info = ProjectInfo.new(@project, name: name, description: description, type: "normal")
   end
 
   def create_repository(name, description)
     @conversation.service("create_repository(#{name}, #{description})")
-    @repository_info = RepositoryInfo.new(@repository, name: name, description: description, slug: name.tr(" ", "-").downcase, type: "normal")
+    @repository_info = RepositoryInfo.new(name.tr(" ", "-").downcase, name: name, description: description, type: "normal")
   end
 
   def pull_requests(approvals_count, builds_count)
@@ -64,5 +66,13 @@ class DummyBitbucket < Services::Bitbucket
 
   def personal_admin_access(administrators)
     @conversation.service("personal_admin_access([#{administrators.join(', ')}])")
+  end
+
+  def close
+    @conversation.service("close(#{yield})")
+  end
+
+  def reopen
+    @conversation.service("reopen(#{yield})")
   end
 end

@@ -67,8 +67,8 @@ RSpec.describe Dialogs::CloseProject do
           BOT: Ok, #{project.key} project exist.
           BOT: Do you want to close whole project? KBD: Yes, No
           USR: #{payload.shift}
-          SRV: close(#{bitbucket.project_link})
-          SRV: close(#{bitbucket.project_link}/repos/normal)
+          SRV: close('[Closed] ', #{bitbucket.project_link})
+          SRV: close('CLOSED_', #{bitbucket.project_link}/repos/normal)
           BOT: Project closed! LNK: #{bitbucket.projects_link(Services::Bitbucket::BROWSER_PREFIX)}/#{project.key}
         TEXT
       end

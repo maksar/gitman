@@ -68,11 +68,11 @@ class DummyBitbucket < Services::Bitbucket
     @conversation.service("personal_admin_access([#{administrators.join(', ')}])")
   end
 
-  def close
-    @conversation.service("close(#{yield})")
+  def close(prefix)
+    @conversation.service("close('#{prefix}', #{yield})")
   end
 
-  def reopen
-    @conversation.service("reopen(#{yield})")
+  def reopen(prefix)
+    @conversation.service("reopen('#{prefix}', #{yield})")
   end
 end

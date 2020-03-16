@@ -43,7 +43,7 @@ RSpec.describe Dialogs::CloseRepository do
       BOT: What is Bitbucket repository key?
       USR: #{payload.shift}
       BOT: Ok, #{repository.slug} repository exist in #{project.key} project.
-      SRV: close(#{bitbucket.project_link}/repos/#{repository.slug})
+      SRV: close('CLOSED_', #{bitbucket.project_link}/repos/#{repository.slug})
       BOT: Repository closed! LNK: #{bitbucket.projects_link(Services::Bitbucket::BROWSER_PREFIX)}/#{project.key}/repos/#{repository.slug}
     TEXT
   end
@@ -63,7 +63,7 @@ RSpec.describe Dialogs::CloseRepository do
           BOT: What is Bitbucket repository key?
           USR: #{payload.shift}
           BOT: Ok, #{repository.slug} repository exist in #{project.key} project.
-          SRV: close(#{bitbucket.project_link}/repos/#{repository.slug})
+          SRV: close('CLOSED_', #{bitbucket.project_link}/repos/#{repository.slug})
           BOT: Repository closed! LNK: #{bitbucket.projects_link(Services::Bitbucket::BROWSER_PREFIX)}/#{project.key}/repos/#{repository.slug}
           BOT: All repositories in #{project.key} project are closed. Do you alse want to close the project itself? KBD: Yes, No
           USR: #{payload.shift}
@@ -78,11 +78,11 @@ RSpec.describe Dialogs::CloseRepository do
           BOT: What is Bitbucket repository key?
           USR: #{payload.shift}
           BOT: Ok, #{repository.slug} repository exist in #{project.key} project.
-          SRV: close(#{bitbucket.project_link}/repos/#{repository.slug})
+          SRV: close('CLOSED_', #{bitbucket.project_link}/repos/#{repository.slug})
           BOT: Repository closed! LNK: #{bitbucket.projects_link(Services::Bitbucket::BROWSER_PREFIX)}/#{project.key}/repos/#{repository.slug}
           BOT: All repositories in #{project.key} project are closed. Do you alse want to close the project itself? KBD: Yes, No
           USR: #{payload.shift}
-          SRV: close(#{bitbucket.project_link})
+          SRV: close('[Closed] ', #{bitbucket.project_link})
           BOT: Project closed! LNK: #{bitbucket.project_link(Services::Bitbucket::BROWSER_PREFIX)}
         TEXT
       end

@@ -5,6 +5,7 @@ require "rest-client"
 require "base64"
 require "cgi"
 require "active_support/core_ext/object/try"
+require "active_support/core_ext/object/blank"
 
 module Services
   class Bitbucket
@@ -12,7 +13,7 @@ module Services
     BROWSER_PREFIX = ""
 
     CLOSED_REPOSITORY_PREFIX = "CLOSED_"
-    CLOSED_PROJECT_PREFIX = "[Closed] "
+    CLOSED_PROJECT_PREFIX = "[Closed]"
 
     def initialize(project, repository)
       @project = project
@@ -103,27 +104,27 @@ module Services
     end
 
     def close_repository
-      close(&method(:repository_link))
+      close(CLOSED_REPOSITORY_PREFIX, &method(:repository_link))
     end
 
     def reopen_repository
-      reopen(&method(:repository_link))
-      reopen(&method(:project_link))
+      reopen(CLOSED_REPOSITORY_PREFIX, &method(:repository_link))
+      reopen(CLOSED_PROJECT_PREFIX, &method(:project_link))
     end
 
     def close_project
-      close(&method(:project_link))
+      close(CLOSED_PROJECT_PREFIX + " ", &method(:project_link))
       open_repositories.each do |repo|
         @repository = repo["slug"]
-        close(&method(:repository_link))
+        close(CLOSED_REPOSITORY_PREFIX, &method(:repository_link))
       end
     end
 
     def reopen_project
-      reopen(&method(:project_link))
+      reopen(CLOSED_PROJECT_PREFIX, &method(:project_link))
       closed_repositories.each do |repo|
         @repository = repo["slug"]
-        reopen(&method(:repository_link))
+        reopen(CLOSED_REPOSITORY_PREFIX, &method(:repository_link))
       end
     end
 
@@ -141,17 +142,20 @@ module Services
       get(project_link + "/repos?limit=100").fetch("values", [])
     end
 
-    def reopen
-      get(yield).tap { |info| put(yield, name: info["name"].to_s.delete_prefix(CLOSED_REPOSITORY_PREFIX), description: info["description"].to_s.delete_prefix(CLOSED_PROJECT_PREFIX)) }
+    def reopen(closed_name_prefix)
+      get(yield).tap do |info|
+        description = info["description"].to_s.delete_prefix(CLOSED_PROJECT_PREFIX).presence || "empty description"
+        put(yield, name: info["name"].to_s.delete_prefix(closed_name_prefix).strip, description: description)
+      end
     end
 
-    def close
+    def close(closed_name_prefix)
       [["#{yield}/permissions/groups", proc { |info| "#{yield}/permissions/groups?name=#{CGI.escape(info['group']['name'])}" }],
        ["#{yield}/permissions/users", proc { |info| "#{yield}/permissions/users?name=#{CGI.escape(info['user']['name'])}" }],
        ["#{yield('/rest/keys/1.0')}/ssh", proc { |info| "#{yield('/rest/keys/1.0')}/ssh/#{info['key']['id']}" }]].each do |get_url, delete_url|
         get(get_url + "?limit=100").fetch("values", []).each { |info| delete(delete_url.call(info)) }
       end
-      get(yield).tap { |info| put(yield, name: CLOSED_REPOSITORY_PREFIX + info["name"].to_s, description: CLOSED_PROJECT_PREFIX + info["description"].to_s) }
+      get(yield).tap { |info| put(yield, name: closed_name_prefix + info["name"].to_s, description: CLOSED_PROJECT_PREFIX + " " + info["description"].to_s) }
     end
 
     def user(full_name)

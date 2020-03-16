@@ -82,8 +82,8 @@ RSpec.describe Dialogs::ReopenProject do
         BOT: Ok, #{project.key} project exist.
         BOT: Do you want to reopen whole project? KBD: Yes, No
         USR: #{payload.shift}
-        SRV: reopen(#{bitbucket.project_link})
-        SRV: reopen(#{bitbucket.project_link}/repos/archived)
+        SRV: reopen('[Closed]', #{bitbucket.project_link})
+        SRV: reopen('CLOSED_', #{bitbucket.project_link}/repos/archived)
         BOT: Project reopened! LNK: #{bitbucket.projects_link(Services::Bitbucket::BROWSER_PREFIX)}/#{project.key}
       TEXT
     end

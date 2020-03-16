@@ -43,8 +43,8 @@ RSpec.describe Dialogs::ReopenRepository do
         BOT: What is Bitbucket repository key?
         USR: #{payload.shift}
         BOT: Ok, closed #{repository.slug} repository exist in #{project.key} project.
-        SRV: reopen(#{bitbucket.project_link}/repos/#{repository.slug})
-        SRV: reopen(#{bitbucket.project_link})
+        SRV: reopen('CLOSED_', #{bitbucket.project_link}/repos/#{repository.slug})
+        SRV: reopen('[Closed]', #{bitbucket.project_link})
         BOT: Repository and a project reopened! LNK: #{bitbucket.projects_link(Services::Bitbucket::BROWSER_PREFIX)}/#{project.key}/repos/#{repository.slug}
       TEXT
     end

@@ -1,15 +1,15 @@
 GIT
-  remote: https://github.com/maksar/rubocop.git
-  revision: db9f1cff43cdcbb25318bc13e0eb10ee2e3287e0
-  ref: db9f1c
+  remote: https://github.com/rubocop-hq/rubocop.git
+  revision: 8633992defcdd366829786bc911d5846753402df
   specs:
-    rubocop (0.78.0)
+    rubocop (0.80.1)
       jaro_winkler (~> 1.5.1)
       parallel (~> 1.10)
       parser (>= 2.7.0.1)
       rainbow (>= 2.2.2, < 4.0)
+      rexml
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 1.4.0, < 1.7)
+      unicode-display_width (>= 1.4.0, < 2.0)
 
 GEM
   remote: https://rubygems.org/
@@ -55,7 +55,7 @@ GEM
     net-ldap (0.16.2)
     netrc (0.11.0)
     parallel (1.19.1)
-    parser (2.7.0.2)
+    parser (2.7.0.4)
       ast (~> 2.4.0)
     pry (0.12.2)
       coderay (~> 1.1.0)
@@ -66,13 +66,14 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
+    rexml (3.2.4)
     rspec (3.9.0)
       rspec-core (~> 3.9.0)
       rspec-expectations (~> 3.9.0)
       rspec-mocks (~> 3.9.0)
     rspec-core (3.9.1)
       rspec-support (~> 3.9.1)
-    rspec-expectations (3.9.0)
+    rspec-expectations (3.9.1)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.9.0)
     rspec-mocks (3.9.1)
@@ -84,10 +85,10 @@ GEM
     rubocop-rspec (1.38.1)
       rubocop (>= 0.68.1)
     ruby-progressbar (1.10.1)
-    simplecov (0.18.2)
+    simplecov (0.18.5)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
-    simplecov-html (0.12.0)
+    simplecov-html (0.12.2)
     telegram-bot-ruby (0.12.0)
       faraday
       inflecto
@@ -98,13 +99,13 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.6)
-    unicode-display_width (1.6.1)
+    unicode-display_width (1.7.0)
     virtus (1.0.5)
       axiom-types (~> 0.1)
       coercible (~> 1.0)
       descendants_tracker (~> 0.0, >= 0.0.3)
       equalizer (~> 0.0, >= 0.0.9)
-    zeitwerk (2.2.2)
+    zeitwerk (2.3.0)
 
 PLATFORMS
   ruby

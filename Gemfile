@@ -9,7 +9,7 @@ gem "net-ldap"
 
 group :development do
   gem "pry"
-  gem "rubocop", github: "maksar/rubocop", ref: "db9f1c"
+  gem "rubocop", github: "rubocop-hq/rubocop"
   gem "rubocop-performance"
   gem "rubocop-rspec"
   gem "rspec"

@@ -82,7 +82,7 @@
               bin=$out/bin/gitman
               cat > $bin <<EOF
                 #!/bin/bash -e
-                exec ${ruby}/bin/bundle exec ${ruby}/bin/ruby $out/share/gitman/server.rb
+                exec ${bundler}/bin/bundle exec ${ruby}/bin/ruby $out/share/gitman/server.rb \$@
               EOF
               chmod +x $bin
             '';

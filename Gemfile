@@ -2,16 +2,16 @@
 
 source "https://rubygems.org"
 
-gem "telegram-bot-ruby"
-gem "rest-client"
 gem "activesupport"
 gem "net-ldap"
+gem "rest-client"
+gem "telegram-bot-ruby"
 
 group :development do
   gem "pry"
-  gem "rubocop", github: "rubocop-hq/rubocop"
+  gem "rspec"
+  gem "rubocop"
   gem "rubocop-performance"
   gem "rubocop-rspec"
-  gem "rspec"
-  gem "simplecov", ">= 0.18.0.beta1"
+  gem "simplecov"
 end

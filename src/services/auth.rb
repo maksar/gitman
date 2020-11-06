@@ -8,7 +8,8 @@ module Services
   class Auth
     LIST_OF_ALLOWED_USERNAMES = "allowed"
 
-    def initialize(active_directory = ActiveDirectory.new, store = YAML::Store.new("config/users.yml"))
+    def initialize(active_directory = ActiveDirectory.new,
+                   store = YAML::Store.new(File.expand_path("#{ENV.fetch('GITMAN_CONFIG_FOLDER')}/users.yml")))
       @active_directory = active_directory
       @store = store
     end

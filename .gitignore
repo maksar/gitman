@@ -4,3 +4,5 @@
 coverage/
 config/*.yml
 config/*.cer
+.direnv
+vendor/bundle

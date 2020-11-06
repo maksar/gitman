@@ -12,6 +12,9 @@ module Services
     API_PREFIX = "/rest/api/1.0"
     BROWSER_PREFIX = ""
 
+    BRANCHES = %w[master dev develop development prod production stage staging].freeze
+    MERGE_RESTRICTINOS = %w[fast-forward-only pull-request-only no-deletes].freeze
+
     CLOSED_REPOSITORY_PREFIX = "CLOSED_"
     CLOSED_PROJECT_PREFIX = "[Closed]"
 
@@ -37,7 +40,7 @@ module Services
     end
 
     def projects_link(prefix = API_PREFIX)
-      ENV.fetch("GITMAN_BITBUCKET_URL") + prefix + "/projects"
+      "#{ENV.fetch('GITMAN_BITBUCKET_URL')}#{prefix}/projects"
     end
 
     def project_link(prefix = API_PREFIX)
@@ -79,12 +82,10 @@ module Services
     end
 
     def branch_permissions
-      %w[master dev develop development prod production stage staging].each do |branch|
-        %w[fast-forward-only pull-request-only no-deletes].each do |restriction|
-          post("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-permissions/2.0/projects/#{@project}/repos/#{@repository}/restrictions",
-               type: restriction, users: [], groups: [], accessKeys: [],
-               matcher: { id: branch, displayId: branch, type: { id: "PATTERN", name: "Pattern" }, active: true })
-        end
+      BRANCHES.product(MERGE_RESTRICTINOS).each do |branch, restriction|
+        post("#{ENV.fetch('GITMAN_BITBUCKET_URL')}/rest/branch-permissions/2.0/projects/#{@project}/repos/#{@repository}/restrictions",
+             type: restriction, users: [], groups: [], accessKeys: [],
+             matcher: { id: branch, displayId: branch, type: { id: "PATTERN", name: "Pattern" }, active: true })
       end
     end
 
@@ -113,7 +114,7 @@ module Services
     end
 
     def close_project
-      close(CLOSED_PROJECT_PREFIX + " ", &method(:project_link))
+      close("#{CLOSED_PROJECT_PREFIX} ", &method(:project_link))
       open_repositories.each do |repo|
         @repository = repo["slug"]
         close(CLOSED_REPOSITORY_PREFIX, &method(:repository_link))
@@ -139,7 +140,7 @@ module Services
     private
 
     def repositories
-      get(project_link + "/repos?limit=100").fetch("values", [])
+      get("#{project_link}/repos?limit=100").fetch("values", [])
     end
 
     def reopen(closed_name_prefix)
@@ -153,9 +154,9 @@ module Services
       [["#{yield}/permissions/groups", proc { |info| "#{yield}/permissions/groups?name=#{CGI.escape(info['group']['name'])}" }],
        ["#{yield}/permissions/users", proc { |info| "#{yield}/permissions/users?name=#{CGI.escape(info['user']['name'])}" }],
        ["#{yield('/rest/keys/1.0')}/ssh", proc { |info| "#{yield('/rest/keys/1.0')}/ssh/#{info['key']['id']}" }]].each do |get_url, delete_url|
-        get(get_url + "?limit=100").fetch("values", []).each { |info| delete(delete_url.call(info)) }
+        get("#{get_url}?limit=100").fetch("values", []).each { |info| delete(delete_url.call(info)) }
       end
-      get(yield).tap { |info| put(yield, name: closed_name_prefix + info["name"].to_s, description: CLOSED_PROJECT_PREFIX + " " + info["description"].to_s) }
+      get(yield).tap { |info| put(yield, name: closed_name_prefix + info["name"].to_s, description: "#{CLOSED_PROJECT_PREFIX} #{info['description']}") }
     end
 
     def user(full_name)

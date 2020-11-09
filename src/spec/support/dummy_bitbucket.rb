@@ -13,9 +13,7 @@ class DummyBitbucket < Services::Bitbucket
     @repositories = repositories
   end
 
-  attr_reader :project_info
-  attr_reader :repository_info
-  attr_reader :repositories
+  attr_reader :project_info, :repository_info, :repositories
 
   def assign(project, repository)
     @project = project

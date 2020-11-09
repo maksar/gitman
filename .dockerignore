@@ -1,8 +1,0 @@
-coverage/
-deep_cover/
-config/
-*.md
-spec/
-.*
-Dockerfile
-Makefile

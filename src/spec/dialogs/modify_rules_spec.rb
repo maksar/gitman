@@ -18,7 +18,7 @@ RSpec.describe Dialogs::ModifyRules do
   let(:user_with_access) { "with_access" }
   let(:manager) { "manager" }
   let(:group) { "GROUP" }
-  let(:non_existent_group) { group + "MISSING" }
+  let(:non_existent_group) { "#{group}MISSING" }
   let(:bitbucket) { DummyBitbucket.new(conversation, project, repository) }
 
   context "when active directory doesn't matter" do

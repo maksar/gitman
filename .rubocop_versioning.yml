@@ -1,6 +1,0 @@
-Style/HashEachMethods:
-  Enabled: true
-Style/HashTransformKeys:
-  Enabled: True
-Style/HashTransformValues:
-  Enabled: True

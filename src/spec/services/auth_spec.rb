@@ -9,7 +9,7 @@ RSpec.describe Services::Auth do
   subject(:auth_service) { described_class.new(active_directory, store) }
 
   let(:uid) { rand(Float::MAX) }
-  let(:phone) { " - " + rand(Float::MAX).to_s }
+  let(:phone) { " - #{rand(Float::MAX)}" }
   let(:first_name) { "First" }
   let(:last_name) { "Last" }
   let(:name) { [last_name, first_name].join(", ") }
@@ -26,19 +26,19 @@ RSpec.describe Services::Auth do
 
   context "when user have all required attributes" do
     let(:store) { DummyStore.new(described_class::LIST_OF_ALLOWED_USERNAMES => [name]) }
-    let(:user) { { uid: uid.to_s, phone: " + " + phone } }
+    let(:user) { { uid: uid.to_s, phone: " + #{phone}" } }
 
     it_behaves_like "does not authorize unknown contact" do
       let(:user) { { uid: nil } }
     end
     it_behaves_like "does not authorize unknown contact" do
-      let(:user) { { uid: uid.to_s, phone: phone + "0" } }
+      let(:user) { { uid: uid.to_s, phone: "#{phone}0" } }
     end
     it_behaves_like "does not authorize unknown contact" do
-      let(:user) { { uid: uid.to_s + "0", phone: phone } }
+      let(:user) { { uid: "#{uid}0", phone: phone } }
     end
     it_behaves_like "does not authorize unknown contact" do
-      let(:user) { { uid: uid.to_s + "0", phone: phone + "0" } }
+      let(:user) { { uid: "#{uid}0", phone: "#{phone}0" } }
     end
 
     it_behaves_like "does not authorize unknown contact" do

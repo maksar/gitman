@@ -1,0 +1,60 @@
+{
+  "nodes": {
+    "bundix": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1603214446,
+        "narHash": "sha256-R1zBgEXgbZQ65BHw22/40dJD36R9SbB15EBeWteAHYA=",
+        "owner": "maksar",
+        "repo": "bundix",
+        "rev": "30690de4b52dbb6d28dba5fff26803ce00ccdb73",
+        "type": "github"
+      },
+      "original": {
+        "owner": "maksar",
+        "repo": "bundix",
+        "type": "github"
+      }
+    },
+    "flake-utils": {
+      "locked": {
+        "lastModified": 1601282935,
+        "narHash": "sha256-WQAFV6sGGQxrRs3a+/Yj9xUYvhTpukQJIcMbIi7LCJ4=",
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "rev": "588973065fce51f4763287f0fda87a174d78bf48",
+        "type": "github"
+      },
+      "original": {
+        "owner": "numtide",
+        "repo": "flake-utils",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1604695574,
+        "narHash": "sha256-3CeGopRvPR/v32kV4BXPWJlUmYUvj9DVQezcGctf0iY=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "25120462e91be59ca16e6f5a75099961c6573f72",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "release-20.09",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "bundix": "bundix",
+        "flake-utils": "flake-utils",
+        "nixpkgs": "nixpkgs"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

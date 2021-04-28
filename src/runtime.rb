@@ -22,6 +22,7 @@ class Runtime
   private
 
   def known_user?(message)
+    return false unless message
     return false unless authorize_user(message)
 
     unless @auth.allowed?(message.from.id)

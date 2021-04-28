@@ -32,6 +32,10 @@ class Runtime
   end
 
   def authorize_user(message)
+    unless message.contact
+      print(message.chat.id, text: "I insist, I will not speak to strangers.", contact: "Give me your contact")
+      return false
+    end
     message.contact.try do |contact|
       if (person = @auth.authorize(contact))
         print(message.chat.id, text: "I recognize you, #{person}!")

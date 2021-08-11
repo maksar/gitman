@@ -164,7 +164,7 @@ module Services
     end
 
     def headers
-      { Authorization: "Basic #{Base64.encode64([ENV.fetch('GITMAN_BITBUCKET_USERNAME'), ENV.fetch('GITMAN_BITBUCKET_PASSWORD')].join(':')).strip}", content_type: :json }
+      { Authorization: "Bearer #{ENV.fetch('GITMAN_BITBUCKET_TOKEN')}", content_type: :json }
     end
 
     def post(url, data)

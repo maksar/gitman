@@ -2,7 +2,6 @@
 
 require "json"
 require "rest-client"
-require "base64"
 require "cgi"
 require "active_support/core_ext/object/try"
 require "active_support/core_ext/object/blank"

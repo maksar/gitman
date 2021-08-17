@@ -31,7 +31,7 @@ module Services
     end
 
     def create_project(name, description)
-      post(projects_link, key: @project, name: name, description: description, public: false)
+      put(projects_link, key: @project, name: name, description: description, public: false)
     end
 
     def create_repository(name, description)
